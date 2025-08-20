@@ -40,7 +40,7 @@ const PreviewPage: React.FC = () => {
         let remainingHeight = imgHeight;
         
         while (remainingHeight > 0) {
-          const pageHeight = Math.min(pdfHeight, remainingHeight);
+          // const pageHeight = Math.min(pdfHeight, remainingHeight);
           
           if (position > 0) {
             pdf.addPage();
