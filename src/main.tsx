@@ -6,9 +6,12 @@ import './index.css'
 import App from './App.tsx'
 import { store } from './store/store'
 
+// Get the base URL for GitHub Pages
+const basename = import.meta.env.PROD ? '/my-resume-builder' : '';
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <Provider store={store}>
         <App />
       </Provider>
