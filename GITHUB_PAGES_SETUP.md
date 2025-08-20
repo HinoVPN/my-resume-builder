@@ -64,3 +64,28 @@ https://[your-github-username].github.io/my-resume-builder/
 4. **分享您的Resume Builder**！
 
 您的免費、專業的簡歷生成器即將上線！🎉
+
+## 🐛 故障排除 - "Getting Pages deployment status..." 無限循環
+
+### **解決方案1：使用備用工作流程**
+1. 前往 **Actions** 頁面
+2. 選擇 **Deploy to GitHub Pages (Alternative)**
+3. 點擊 **Run workflow** 手動執行
+
+### **解決方案2：檢查權限設定**
+1. 前往 **Settings** → **Actions** → **General**
+2. 確保 **Workflow permissions** 設為：
+   - ✅ "Read and write permissions"
+   - ✅ "Allow GitHub Actions to create and approve pull requests"
+
+### **解決方案3：重新設定GitHub Pages**
+1. **Settings** → **Pages**
+2. 將Source改為 **Deploy from a branch**
+3. 選擇 **gh-pages** 分支 (備用工作流程會創建)
+4. 使用備用工作流程部署
+
+### **解決方案4：清除並重試**
+1. 前往 **Actions** 頁面
+2. 取消正在運行的工作流程
+3. 等待2-3分鐘
+4. 重新觸發部署

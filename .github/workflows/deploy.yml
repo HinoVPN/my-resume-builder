@@ -7,7 +7,7 @@ on:
   push:
     branches: ["main", "master"]
   
-  # Runs on pull requests
+  # Runs on pull requests (build only, no deploy)
   pull_request:
     branches: ["main", "master"]
   
@@ -20,15 +20,14 @@ permissions:
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# Allow only one concurrent deployment
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  # Build job
-  build:
+  # Build and deploy job
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -49,26 +48,17 @@ jobs:
       - name: Build project
         run: npm run build
         
-      - name: Setup Pages
+      - name: Setup Pages (only on main branch push)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         uses: actions/configure-pages@v4
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload to GitHub Pages (only on main branch push)
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        uses: actions/upload-pages-artifact@v3
         with:
-          # Upload dist folder
           path: './dist'
-
-  # Deployment job (only runs on push to main/master, not on PRs)
-  deploy:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
+          
+      - name: Deploy to GitHub Pages (only on main branch push)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         id: deployment
         uses: actions/deploy-pages@v4
