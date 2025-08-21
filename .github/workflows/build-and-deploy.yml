@@ -1,0 +1,83 @@
+# Build, Test and Deploy Resume Builder to GitHub Pages
+name: Build and Deploy
+
+# Trigger conditions
+on:
+  # Runs on pushes to main branch (deploy)
+  push:
+    branches: ["main", "master"]
+  
+  # Runs on pull requests (build and test only)
+  pull_request:
+    branches: ["main", "master"]
+  
+  # Allows manual workflow execution
+  workflow_dispatch:
+
+# Permissions for GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # Build, test and optionally deploy
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run ESLint
+      run: npm run lint
+      
+    - name: Type check
+      run: npx tsc --noEmit
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Display build info
+      run: |
+        echo "✅ Build completed successfully!"
+        echo "📦 Build size:"
+        du -sh dist/
+        echo "📁 Build artifacts:"
+        ls -la dist/
+      
+    # GitHub Pages setup and deployment (only on main branch push)
+    - name: Setup GitHub Pages
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+      uses: actions/configure-pages@v4
+      
+    - name: Upload to GitHub Pages
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist'
+        
+    - name: Deploy to GitHub Pages
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+      id: deployment
+      uses: actions/deploy-pages@v4
+      
+    - name: Display deployment info
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+      run: |
+        echo "🚀 Deployment completed!"
+        echo "🌐 Your resume builder is now live at: ${{ steps.deployment.outputs.page_url }}"
