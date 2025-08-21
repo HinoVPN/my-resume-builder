@@ -20,23 +20,35 @@ const PreviewPage: React.FC = () => {
     } catch (error) {
       console.error('Error generating DOCX:', error);
       
+      // Detect mobile devices
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      
       let errorMessage = 'Failed to generate Word document. ';
       
-      if (error instanceof Error) {
-        if (error.message.includes('Buffer') || error.message.includes('nodebuffer')) {
-          errorMessage += 'Browser compatibility issue. Using alternative method.';
-        } else if (error.message.includes('saveAs')) {
-          errorMessage += 'Issue with file download.';
-        } else if (error.message.includes('platform')) {
-          errorMessage += 'Platform compatibility issue.';
-        } else {
-          errorMessage += `Error: ${error.message}`;
-        }
+      if (isMobile) {
+        errorMessage = '📱 Word download may not work on mobile devices. ';
+        errorMessage += 'Please try:\n\n';
+        errorMessage += '1. Use the "Download Text" button as an alternative\n';
+        errorMessage += '2. Open this page on a desktop/laptop computer\n';
+        errorMessage += '3. Email yourself this page link to access on a computer\n\n';
+        errorMessage += 'This is due to iOS/Android browser limitations with file downloads.';
       } else {
-        errorMessage += 'Unknown error occurred.';
+        if (error instanceof Error) {
+          if (error.message.includes('Buffer') || error.message.includes('nodebuffer')) {
+            errorMessage += 'Browser compatibility issue. Try using a different browser.';
+          } else if (error.message.includes('saveAs')) {
+            errorMessage += 'Issue with file download. Please try again.';
+          } else if (error.message.includes('platform')) {
+            errorMessage += 'Platform compatibility issue.';
+          } else {
+            errorMessage += `Error: ${error.message}`;
+          }
+        } else {
+          errorMessage += 'Unknown error occurred.';
+        }
+        errorMessage += '\n\nPlease check the browser console for more details and try again.';
       }
       
-      errorMessage += '\n\nPlease check the browser console for more details and try again.';
       alert(errorMessage);
     }
   };
@@ -68,63 +80,105 @@ const PreviewPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <button
-            onClick={() => navigate('/optional')}
-            className="btn-secondary flex items-center"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Edit
-          </button>
-          
-          <div className="flex items-center space-x-4">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          {/* Mobile Layout: Stack vertically */}
+          <div className="flex flex-col space-y-4 sm:hidden">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/optional')}
+              className="btn-secondary flex items-center justify-center w-full py-3"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Edit
+            </button>
+            
+            <div className="grid grid-cols-1 gap-3">
+              <button
+                onClick={() => navigate('/')}
+                className="btn-secondary flex items-center justify-center w-full py-3"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Resume
+              </button>
+              <button
+                onClick={handleDownloadDocx}
+                className="btn-primary flex items-center justify-center w-full py-3"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download Word
+              </button>
+              <button
+                onClick={handleDownloadText}
+                className="btn-secondary flex items-center justify-center w-full py-3"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download Text
+              </button>
+            </div>
+          </div>
+
+          {/* Tablet/Desktop Layout: Horizontal */}
+          <div className="hidden sm:flex justify-between items-center">
+            <button
+              onClick={() => navigate('/optional')}
               className="btn-secondary flex items-center"
             >
-              <Edit className="w-4 h-4 mr-2" />
-              Edit Resume
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Edit
             </button>
-            <button
-              onClick={handleDownloadDocx}
-              className="btn-primary flex items-center mr-2"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Download Word
-            </button>
-            <button
-              onClick={handleDownloadText}
-              className="btn-secondary flex items-center"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Download Text
-            </button>
+            
+            <div className="flex items-center space-x-3 md:space-x-4">
+              <button
+                onClick={() => navigate('/')}
+                className="btn-secondary flex items-center"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                <span className="hidden md:inline">Edit Resume</span>
+                <span className="md:hidden">Edit</span>
+              </button>
+              <button
+                onClick={handleDownloadDocx}
+                className="btn-primary flex items-center"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                <span className="hidden md:inline">Download Word</span>
+                <span className="md:hidden">Word</span>
+              </button>
+              <button
+                onClick={handleDownloadText}
+                className="btn-secondary flex items-center"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                <span className="hidden md:inline">Download Text</span>
+                <span className="md:hidden">Text</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Resume Preview - Professional DOCX Style */}
-      <div className="max-w-4xl mx-auto p-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8">
         <div 
           ref={resumeRef}
           className="bg-white shadow-lg resume-content docx-style"
           style={{ 
-            width: '8.5in',
+            maxWidth: '100%',
+            width: 'min(8.5in, 100vw - 2rem)',
             minHeight: '11in',
             backgroundColor: '#ffffff', 
             color: '#000000',
             margin: '0 auto',
-            padding: '1in',
+            padding: 'clamp(0.5in, 5vw, 1in)',
             boxSizing: 'border-box',
             fontFamily: 'Times, "Times New Roman", serif',
-            fontSize: '12pt',
+            fontSize: 'clamp(10pt, 2.5vw, 12pt)',
             lineHeight: '1.15'
           }}
         >
           {/* Header */}
-          <header className="text-center mb-6" style={{ borderBottom: '1px solid #ccc', paddingBottom: '12pt' }}>
+          <header className="text-center mb-6" style={{ paddingBottom: '12pt' }}>
             <h1 style={{ 
-              fontSize: '20pt', 
+              fontSize: 'clamp(16pt, 4vw, 32pt)', 
               fontWeight: 'bold', 
               margin: '0 0 6pt 0',
               color: '#000000'
@@ -133,7 +187,7 @@ const PreviewPage: React.FC = () => {
             </h1>
             {resumeData.personalInfo.jobTitle && (
               <p style={{ 
-                fontSize: '14pt', 
+                fontSize: 'clamp(12pt, 3vw, 24pt)', 
                 margin: '0 0 12pt 0',
                 color: '#666666'
               }}>
@@ -373,11 +427,13 @@ const PreviewPage: React.FC = () => {
               }}>
                 Skills
               </h2>
-              <table style={{ 
-                width: '100%', 
-                borderCollapse: 'collapse',
-                marginTop: '6pt'
-              }}>
+              <div className="overflow-x-auto">
+                <table style={{ 
+                  width: '100%', 
+                  minWidth: '600px',
+                  borderCollapse: 'collapse',
+                  marginTop: '6pt'
+                }}>
                 <thead>
                   <tr>
                     <th style={{ 
@@ -534,6 +590,7 @@ const PreviewPage: React.FC = () => {
                   })()}
                 </tbody>
               </table>
+              </div>
             </section>
           )}
 
@@ -640,20 +697,38 @@ const PreviewPage: React.FC = () => {
           )}
         </div>
 
-        {/* Document Info */}
-        <div className="text-center mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800">
-            📄 <strong>Professional Resume Preview:</strong> This preview matches the DOCX format exactly. 
-            The design uses professional Word document styling with Times New Roman font, proper spacing, and standard business formatting.
-          </p>
-        </div>
+        {/* Information Cards */}
+        <div className="space-y-4 mt-6">
+          {/* Document Info */}
+          <div className="text-center p-3 md:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-xs sm:text-sm text-blue-800">
+              📄 <strong>Professional Resume Preview:</strong> This preview matches the DOCX format exactly. 
+              <span className="hidden sm:inline">The design uses professional Word document styling with Times New Roman font, proper spacing, and standard business formatting.</span>
+            </p>
+          </div>
 
-        {/* Privacy Notice */}
-        <div className="text-center mt-8 p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-800">
-            🔒 <strong>Privacy Protected:</strong> All your data is processed locally and never stored on our servers. 
-            Please save your generated PDF file safely.
-          </p>
+          {/* Mobile Device Notice */}
+          <div className="text-center p-3 md:p-4 bg-orange-50 border border-orange-200 rounded-lg">
+            <div className="text-xs sm:text-sm text-orange-800">
+              <p className="mb-2 sm:mb-0">
+                📱 <strong>Mobile Users (iPhone/iPad):</strong> If the Word download doesn't work, try:
+              </p>
+              <div className="space-y-1 sm:space-y-0 text-left sm:text-center">
+                <div>• Use the View option instead of Download, then forward to your computer</div>
+                <div>• Use the "Download Text" option as an alternative</div>
+                <div>• Open this page on a desktop/laptop computer</div>
+                <div>• Email yourself the link to access on a computer</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Privacy Notice */}
+          <div className="text-center p-3 md:p-4 bg-blue-50 rounded-lg">
+            <p className="text-xs sm:text-sm text-blue-800">
+              🔒 <strong>Privacy Protected:</strong> All your data is processed locally and never stored on our servers. 
+              <span className="hidden sm:inline">Please save your generated document safely.</span>
+            </p>
+          </div>
         </div>
       </div>
     </div>

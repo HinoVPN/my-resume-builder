@@ -250,7 +250,14 @@ const createRoleText = (roleText: string): Paragraph => {
 // Helper function to create headings with thematic break
 const createHeading = (text: string): Paragraph => {
   return new Paragraph({
-    text: text,
+    children: [
+            new TextRun({
+              text: text,
+              bold: true,
+              size: 28,
+              color: '000000',
+            }),
+          ],
     heading: HeadingLevel.HEADING_1,
     thematicBreak: true,
     spacing: {
