@@ -14,7 +14,7 @@ const parseHtmlContent = (html: string): Array<{content: string, type: 'paragrap
   
   let currentListType: 'bullet' | 'numbered' | null = null;
   let listLevel = 0;
-  let listStack: Array<'bullet' | 'numbered'> = [];
+  const listStack: Array<'bullet' | 'numbered'> = [];
   
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i].trim();

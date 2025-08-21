@@ -1,10 +1,10 @@
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Edit, Globe, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+import { ArrowLeft, Download, Edit } from 'lucide-react';
 import { useAppSelector } from '../hooks/redux';
 import { generateDocx } from '../utils/docxGenerator';
 import { downloadPlainTextResume } from '../utils/docxGeneratorFallback';
-import type { Skill } from '../types/resume';
+
 
 const PreviewPage: React.FC = () => {
   const resumeData = useAppSelector(state => state.resume);
