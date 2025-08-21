@@ -36,6 +36,7 @@ export interface Skill {
   id: string;
   name: string;
   level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+  years?: number; // Optional years of experience
 }
 
 export interface Certificate {

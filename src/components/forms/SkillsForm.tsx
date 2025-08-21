@@ -18,7 +18,8 @@ const SkillsForm: React.FC = () => {
       const newSkill: Skill = {
         id: generateId(),
         name: skillName.trim(),
-        level: 'Intermediate'
+        level: 'Intermediate',
+        years: undefined
       };
       dispatch(addSkill(newSkill));
       setNewSkillName('');
@@ -33,6 +34,14 @@ const SkillsForm: React.FC = () => {
     const skill = skills.find(s => s.id === id);
     if (skill) {
       const updatedSkill = { ...skill, level };
+      dispatch(updateSkill({ id, data: updatedSkill }));
+    }
+  };
+
+  const updateSkillYears = (id: string, years: number | undefined) => {
+    const skill = skills.find(s => s.id === id);
+    if (skill) {
+      const updatedSkill = { ...skill, years };
       dispatch(updateSkill({ id, data: updatedSkill }));
     }
   };
@@ -112,23 +121,9 @@ const SkillsForm: React.FC = () => {
             </label>
             <div className="space-y-3">
               {skills.map((skill) => (
-                <div key={skill.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <span className="font-medium text-gray-900">{skill.name}</span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getLevelColor(skill.level)}`}>
-                      {skill.level}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <select
-                      value={skill.level}
-                      onChange={(e) => updateSkillLevel(skill.id, e.target.value as Skill['level'])}
-                      className="form-select text-sm py-1 px-2"
-                    >
-                      {SKILL_LEVELS.map(level => (
-                        <option key={level} value={level}>{level}</option>
-                      ))}
-                    </select>
+                <div key={skill.id} className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-medium text-gray-900 text-lg">{skill.name}</span>
                     <button
                       type="button"
                       onClick={() => removeSkillItem(skill.id)}
@@ -136,6 +131,52 @@ const SkillsForm: React.FC = () => {
                     >
                       <X className="w-4 h-4" />
                     </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Proficiency Level
+                      </label>
+                      <select
+                        value={skill.level}
+                        onChange={(e) => updateSkillLevel(skill.id, e.target.value as Skill['level'])}
+                        className="form-select"
+                      >
+                        {SKILL_LEVELS.map(level => (
+                          <option key={level} value={level}>{level}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Years of Experience (Optional)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="50"
+                        value={skill.years || ''}
+                        onChange={(e) => {
+                          const years = e.target.value ? parseInt(e.target.value) : undefined;
+                          updateSkillYears(skill.id, years);
+                        }}
+                        className="form-input"
+                        placeholder="e.g., 3"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="mt-3 flex items-center space-x-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getLevelColor(skill.level)}`}>
+                      {skill.level}
+                    </span>
+                    {skill.years && (
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {skill.years} year{skill.years !== 1 ? 's' : ''}
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}

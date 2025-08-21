@@ -153,3 +153,292 @@
   color: inherit;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
+
+/* PDF export optimizations */
+@media print {
+  /* Hide navigation and non-essential elements */
+  .no-print,
+  nav,
+  header:not(.resume-header),
+  footer,
+  button {
+    display: none !important;
+  }
+  
+  /* Ensure all content is visible in PDF */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Print layout optimizations */
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+  
+  .resume-content {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 20mm !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+  
+  /* Ensure page breaks work properly */
+  .break-inside-avoid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* Section break controls */
+  section {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  
+  /* Individual item break controls */
+  .work-experience-item,
+  .education-item {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  
+  /* Prevent orphaned headers */
+  h1, h2, h3 {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+}
+
+/* MS Word style page preview */
+.word-page {
+  width: 210mm !important;
+  height: 297mm !important;
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1), 0 4px 8px -2px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #e5e7eb !important;
+  overflow: hidden !important;
+  position: relative !important;
+  background: white !important;
+}
+
+/* Resume section styling */
+.resume-section {
+  margin-bottom: 1rem;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Ensure content respects page boundaries */
+.word-page .resume-section {
+  page-break-inside: avoid;
+}
+
+/* Force text wrapping in page content */
+.word-page * {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+/* Ensure proper spacing between pages */
+.word-page + .word-page {
+  margin-top: 2rem;
+}
+
+/* MS Word style page break classes */
+.page-break-before {
+  page-break-before: always !important;
+  break-before: page !important;
+}
+
+.page-break-after {
+  page-break-after: always !important;
+  break-after: page !important;
+}
+
+.page-break-inside-avoid {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* Responsive scaling for MS Word style pages */
+@media (max-width: 1200px) {
+  .word-page {
+    width: 100% !important;
+    max-width: 210mm !important;
+    transform: scale(0.85);
+    transform-origin: top center;
+    margin-bottom: 3rem !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .word-page {
+    transform: scale(0.75);
+    margin-bottom: 4rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .word-page {
+    transform: scale(0.65);
+    margin-bottom: 5rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .word-page {
+    transform: scale(0.55);
+    margin-bottom: 6rem !important;
+  }
+}
+
+/* Ensure content is visible for html2canvas */
+.resume-content {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Allow skill badges and other elements to keep their background colors */
+.resume-content * {
+  color: inherit !important;
+}
+
+/* Skill card container background */
+.resume-content .bg-gray-50 {
+  background-color: #f9fafb !important;
+}
+
+/* Skill level badge backgrounds */
+.resume-content .skill-level-badge {
+  background-color: inherit !important;
+}
+
+/* Professional DOCX style */
+.docx-style {
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.docx-style * {
+  font-family: 'Times', 'Times New Roman', serif !important;
+}
+
+.docx-style h1, .docx-style h2, .docx-style h3 {
+  font-family: 'Times', 'Times New Roman', serif !important;
+}
+
+/* Professional spacing for print */
+@media print {
+  .docx-style {
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 1in !important;
+    width: 8.5in !important;
+    min-height: 11in !important;
+  }
+}
+
+/* HTML content styling for preview */
+.resume-content .html-content {
+  font-family: 'Times', 'Times New Roman', serif !important;
+}
+
+.resume-content .html-content p {
+  margin: 0 0 6pt 0 !important;
+  line-height: 1.15 !important;
+}
+
+.resume-content .html-content ul,
+.resume-content .html-content ol {
+  margin: 0 0 6pt 16pt !important;
+  padding: 0 !important;
+  list-style-position: outside !important;
+}
+
+.resume-content .html-content ul {
+  list-style-type: disc !important;
+}
+
+.resume-content .html-content ol {
+  list-style-type: decimal !important;
+}
+
+.resume-content .html-content li {
+  margin: 0 0 3pt 0 !important;
+  line-height: 1.15 !important;
+}
+
+.resume-content .html-content strong,
+.resume-content .html-content b {
+  font-weight: bold !important;
+}
+
+.resume-content .html-content em,
+.resume-content .html-content i {
+  font-style: italic !important;
+}
+
+.resume-content .html-content u {
+  text-decoration: underline !important;
+}
+
+.resume-content .html-content br {
+  line-height: 1.15 !important;
+}
+
+/* Ensure Unicode icons render properly in PDF */
+.unicode-icon {
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', sans-serif;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Ensure skill level badges display correctly */
+.skill-level-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Specific background colors for skill levels */
+.skill-level-badge.bg-red-100 {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+  border-color: #fca5a5 !important;
+}
+
+.skill-level-badge.bg-yellow-100 {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border-color: #fcd34d !important;
+}
+
+.skill-level-badge.bg-blue-100 {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  border-color: #93c5fd !important;
+}
+
+.skill-level-badge.bg-green-100 {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+  border-color: #86efac !important;
+}
+
+.skill-level-badge.bg-gray-100 {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
+  border-color: #d1d5db !important;
+}

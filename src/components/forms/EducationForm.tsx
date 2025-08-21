@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Plus, Trash2 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { addEducation, updateEducation, removeEducation } from '../../store/resumeSlice';
 import { type Education, DEGREES } from '../../types/resume';
+import RichTextEditor from '../common/RichTextEditor';
 
 const EducationForm: React.FC = () => {
   const educations = useAppSelector(state => state.resume.education);
@@ -180,12 +181,11 @@ const EducationForm: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Additional Information (Optional)
                   </label>
-                  <textarea
-                    value={education.additionalInfo}
-                    onChange={(e) => updateEducationField(education.id, 'additionalInfo', e.target.value)}
-                    className="form-textarea"
-                    placeholder="GPA, relevant coursework, honors, awards, etc.&#10;Example: GPA: 3.8/4.0, Summa Cum Laude, Relevant Coursework: Data Structures, Algorithms, Database Systems"
-                    rows={3}
+                  <RichTextEditor
+                    value={education.additionalInfo || ''}
+                    onChange={(content) => updateEducationField(education.id, 'additionalInfo', content)}
+                    placeholder="Add additional information such as:&#10;• GPA: 3.8/4.0&#10;• Honors: Summa Cum Laude&#10;• Relevant Coursework: Data Structures, Algorithms&#10;• Awards and Recognition"
+                    height={200}
                   />
                 </div>
               </div>

@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Plus, Trash2 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { addWorkExperience, updateWorkExperience, removeWorkExperience } from '../../store/resumeSlice';
 import { type WorkExperience, MONTHS } from '../../types/resume';
-import { Editor } from '@hugerte/hugerte-react';
+import RichTextEditor from '../common/RichTextEditor';
 
 const WorkExperienceForm: React.FC = () => {
   const workExperiences = useAppSelector(state => state.resume.workExperiences);
@@ -251,59 +251,13 @@ const WorkExperienceForm: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Responsibilities & Achievements *
                   </label>
-                  <div style={{ border: '1px solid #d1d5db', borderRadius: '0.375rem' }}>
-                    <Editor
-                      value={experience.responsibilities}
-                      onEditorChange={(content) => updateExperience(experience.id, 'responsibilities', content)}
-                                              init={{
-                        height: 180,
-                        menubar: false,
-                        plugins: [
-                          'lists', 'link', 'charmap', 'anchor', 'searchreplace', 'visualblocks',
-                          'insertdatetime', 'table', 'help', 'wordcount'
-                        ],
-                        toolbar: 'bold italic underline | bullist numlist | undo redo',
-                        font_family_formats: 'Inter=Inter,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif',
-                        font_size_formats: '14px',
-                        content_style: `
-                          body { 
-                            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; 
-                            font-size: 14px !important; 
-                            line-height: 1.0 !important; 
-                            margin: 8px 12px !important;
-                            color: #374151 !important;
-                            background-color: #ffffff !important;
-                          }
-                          * {
-                            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-                            font-size: 14px !important;
-                          }
-                          p { 
-                            margin: 0 !important; 
-                            line-height: 1.5 !important;
-                            font-family: inherit !important;
-                          }
-                          ul, ol { 
-                            margin: 0 !important; 
-                            padding-left: 20px !important; 
-                            line-height: 1.0 !important;
-                          }
-                          li { 
-                            margin: 0 !important; 
-                            line-height: 1.0 !important;
-                          }
-                          strong {
-                            font-weight: 600 !important;
-                            color: #374151 !important;
-                          }
-                        `,
-                        placeholder: 'Use bullet points starting with action verbs. Quantify your achievements when possible.',
-                        branding: false,
-                        resize: true,
-                        statusbar: false
-                      }}
-                    />
-                  </div>
+                  <RichTextEditor
+                    value={experience.responsibilities}
+                    onChange={(content) => updateExperience(experience.id, 'responsibilities', content)}
+                    placeholder="Use bullet points starting with action verbs. Quantify your achievements when possible."
+                    height={180}
+                    required={true}
+                  />
                   <div className="mt-2 text-sm text-gray-500">
                     <strong>Tip:</strong> Start with action verbs and use **bold** to highlight key metrics and achievements.
                   </div>
