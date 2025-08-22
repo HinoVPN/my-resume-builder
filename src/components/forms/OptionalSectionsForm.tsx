@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Plus, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { updateOptionalSections } from '../../store/resumeSlice';
-import { type Certificate, type Language, LANGUAGE_PROFICIENCY } from '../../types/resume';
+import { type Certificate, type Language, getLocalizedLanguageProficiency } from '../../types/resume';
 
 const OptionalSectionsForm: React.FC = () => {
   const optionalSections = useAppSelector(state => state.resume.optionalSections);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   
   const [hobbies, setHobbies] = useState(optionalSections.hobbies);
   const [certificates, setCertificates] = useState<Certificate[]>(optionalSections.certificates);
   const [languages, setLanguages] = useState<Language[]>(optionalSections.languages);
+  const localizedLanguageProficiency = getLocalizedLanguageProficiency(i18n.language);
   
   const [expandedSections, setExpandedSections] = useState({
     hobbies: true,
@@ -98,9 +101,9 @@ const OptionalSectionsForm: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Optional Sections</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('optional.title')}</h2>
         <p className="text-gray-600">
-          Add additional information to make your resume stand out. All sections are optional.
+          {t('optional.subtitle')}
         </p>
       </div>
 
@@ -112,7 +115,7 @@ const OptionalSectionsForm: React.FC = () => {
             onClick={() => toggleSection('hobbies')}
             className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50"
           >
-            <h3 className="text-lg font-medium text-gray-900">Hobbies & Interests</h3>
+            <h3 className="text-lg font-medium text-gray-900">{t('optional.hobbies')}</h3>
             {expandedSections.hobbies ? (
               <ChevronDown className="w-5 h-5 text-gray-400" />
             ) : (
@@ -124,17 +127,17 @@ const OptionalSectionsForm: React.FC = () => {
             <div className="p-4 border-t border-gray-200">
               <div className="form-group">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Hobbies & Interests
+                  {t('optional.hobbies')}
                 </label>
                 <input
                   type="text"
                   value={hobbies}
                   onChange={(e) => setHobbies(e.target.value)}
                   className="form-input"
-                  placeholder="e.g., Photography, Hiking, Playing Guitar, Reading, Volunteer Work"
+                  placeholder={t('optional.placeholders.hobbies')}
                 />
                 <div className="mt-2 text-sm text-gray-500">
-                  Separate multiple hobbies with commas. Keep it professional and relevant when possible.
+                  {t('optional.hobbiesTip')}
                 </div>
               </div>
             </div>
@@ -149,7 +152,7 @@ const OptionalSectionsForm: React.FC = () => {
             className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50"
           >
             <h3 className="text-lg font-medium text-gray-900">
-              Certificates ({certificates.length})
+              {t('optional.certificates')} ({certificates.length})
             </h3>
             {expandedSections.certificates ? (
               <ChevronDown className="w-5 h-5 text-gray-400" />
@@ -162,14 +165,14 @@ const OptionalSectionsForm: React.FC = () => {
             <div className="p-4 border-t border-gray-200">
               {certificates.length === 0 ? (
                 <div className="text-center py-6">
-                  <p className="text-gray-500 mb-4">No certificates added yet</p>
+                  <p className="text-gray-500 mb-4">{t('optional.noCertificates')}</p>
                   <button
                     type="button"
                     onClick={addCertificate}
                     className="btn-primary flex items-center mx-auto"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Add Certificate
+                    {t('optional.addCertificate')}
                   </button>
                 </div>
               ) : (
@@ -177,7 +180,7 @@ const OptionalSectionsForm: React.FC = () => {
                   {certificates.map((certificate, index) => (
                     <div key={certificate.id} className="bg-gray-50 p-4 rounded-lg mb-4">
                       <div className="flex justify-between items-center mb-3">
-                        <h4 className="font-medium text-gray-900">Certificate #{index + 1}</h4>
+                        <h4 className="font-medium text-gray-900">{t('optional.certificateNumber', { number: index + 1 })}</h4>
                         <button
                           type="button"
                           onClick={() => removeCertificate(certificate.id)}
@@ -190,41 +193,41 @@ const OptionalSectionsForm: React.FC = () => {
                       <div className="form-row">
                         <div className="form-group">
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Certificate Name
+                            {t('optional.certificateName')}
                           </label>
                           <input
                             type="text"
                             value={certificate.name}
                             onChange={(e) => updateCertificate(certificate.id, 'name', e.target.value)}
                             className="form-input"
-                            placeholder="e.g., AWS Certified Solutions Architect"
+                            placeholder={t('optional.placeholders.certificateName')}
                           />
                         </div>
                         
                         <div className="form-group">
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Issuing Organization
+                            {t('optional.issuingOrganization')}
                           </label>
                           <input
                             type="text"
                             value={certificate.issuer}
                             onChange={(e) => updateCertificate(certificate.id, 'issuer', e.target.value)}
                             className="form-input"
-                            placeholder="e.g., Amazon Web Services"
+                            placeholder={t('optional.placeholders.issuingOrganization')}
                           />
                         </div>
                       </div>
                       
                       <div className="form-group">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Date Obtained
+                          {t('optional.dateObtained')}
                         </label>
                         <input
                           type="text"
                           value={certificate.date}
                           onChange={(e) => updateCertificate(certificate.id, 'date', e.target.value)}
                           className="form-input"
-                          placeholder="e.g., March 2024, 2024"
+                          placeholder={t('optional.placeholders.dateObtained')}
                         />
                       </div>
                     </div>
@@ -237,7 +240,7 @@ const OptionalSectionsForm: React.FC = () => {
                       className="btn-secondary flex items-center mx-auto"
                     >
                       <Plus className="w-4 h-4 mr-2" />
-                      Add Another Certificate
+                      {t('optional.addAnotherCertificate')}
                     </button>
                   </div>
                 </>
@@ -254,7 +257,7 @@ const OptionalSectionsForm: React.FC = () => {
             className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50"
           >
             <h3 className="text-lg font-medium text-gray-900">
-              Languages ({languages.length})
+              {t('optional.languages')} ({languages.length})
             </h3>
             {expandedSections.languages ? (
               <ChevronDown className="w-5 h-5 text-gray-400" />
@@ -267,14 +270,14 @@ const OptionalSectionsForm: React.FC = () => {
             <div className="p-4 border-t border-gray-200">
               {languages.length === 0 ? (
                 <div className="text-center py-6">
-                  <p className="text-gray-500 mb-4">No languages added yet</p>
+                  <p className="text-gray-500 mb-4">{t('optional.noLanguages')}</p>
                   <button
                     type="button"
                     onClick={addLanguage}
                     className="btn-primary flex items-center mx-auto"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Add Language
+                    {t('optional.addLanguage')}
                   </button>
                 </div>
               ) : (
@@ -282,7 +285,7 @@ const OptionalSectionsForm: React.FC = () => {
                   {languages.map((language, index) => (
                     <div key={language.id} className="bg-gray-50 p-4 rounded-lg mb-4">
                       <div className="flex justify-between items-center mb-3">
-                        <h4 className="font-medium text-gray-900">Language #{index + 1}</h4>
+                        <h4 className="font-medium text-gray-900">{t('optional.languageNumber', { number: index + 1 })}</h4>
                         <button
                           type="button"
                           onClick={() => removeLanguage(language.id)}
@@ -295,28 +298,28 @@ const OptionalSectionsForm: React.FC = () => {
                       <div className="form-row">
                         <div className="form-group">
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Language
+                            {t('optional.languageName')}
                           </label>
                           <input
                             type="text"
                             value={language.name}
                             onChange={(e) => updateLanguage(language.id, 'name', e.target.value)}
                             className="form-input"
-                            placeholder="e.g., Spanish, Mandarin, French"
+                            placeholder={t('optional.placeholders.languageName')}
                           />
                         </div>
                         
                         <div className="form-group">
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Proficiency Level
+                            {t('optional.proficiency')}
                           </label>
                           <select
                             value={language.proficiency}
                             onChange={(e) => updateLanguage(language.id, 'proficiency', e.target.value as Language['proficiency'])}
                             className="form-select"
                           >
-                            {LANGUAGE_PROFICIENCY.map(level => (
-                              <option key={level} value={level}>{level}</option>
+                            {localizedLanguageProficiency.map((level, index) => (
+                              <option key={level} value={getLocalizedLanguageProficiency('en')[index]}>{level}</option>
                             ))}
                           </select>
                         </div>
@@ -324,7 +327,7 @@ const OptionalSectionsForm: React.FC = () => {
                       
                       <div className="mt-2">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getProficiencyColor(language.proficiency)}`}>
-                          {language.proficiency}
+                          {t(`optional.proficiencyLevels.${language.proficiency}`)}
                         </span>
                       </div>
                     </div>
@@ -337,7 +340,7 @@ const OptionalSectionsForm: React.FC = () => {
                       className="btn-secondary flex items-center mx-auto"
                     >
                       <Plus className="w-4 h-4 mr-2" />
-                      Add Another Language
+                      {t('optional.addAnotherLanguage')}
                     </button>
                   </div>
                 </>
@@ -353,13 +356,13 @@ const OptionalSectionsForm: React.FC = () => {
             className="btn-secondary flex items-center"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
+            {t('common.back')}
           </button>
           <button 
             type="submit" 
             className="btn-primary flex items-center"
           >
-            Preview Resume
+            {t('optional.previewButton')}
             <ArrowRight className="w-4 h-4 ml-2" />
           </button>
         </div>

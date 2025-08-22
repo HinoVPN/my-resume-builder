@@ -442,3 +442,8 @@
   color: #374151 !important;
   border-color: #d1d5db !important;
 }
+
+/* DOCX Preview Styles - Matching actual DOCX generator settings */
+.docx-preview-container {
+  font-family: 'Times New Roman', Times, serif !important;
+}

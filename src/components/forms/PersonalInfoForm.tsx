@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { updatePersonalInfo } from '../../store/resumeSlice';
@@ -9,6 +10,7 @@ const PersonalInfoForm: React.FC = () => {
   const personalInfo = useAppSelector(state => state.resume.personalInfo);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<PersonalInfo>(personalInfo);
 
   useEffect(() => {
@@ -31,14 +33,14 @@ const PersonalInfoForm: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Personal Information</h2>
-        <p className="text-gray-600">Let's start with your basic contact information.</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('personalInfo.title')}</h2>
+        <p className="text-gray-600">{t('personalInfo.subtitle')}</p>
       </div>
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
-            Full Name *
+            {t('personalInfo.fullName')} *
           </label>
           <input
             type="text"
@@ -47,14 +49,14 @@ const PersonalInfoForm: React.FC = () => {
             value={formData.fullName}
             onChange={handleChange}
             className="form-input"
-            placeholder="e.g., John Smith"
+            placeholder={t('personalInfo.placeholders.fullName')}
             required
           />
         </div>
 
         <div className="mb-4">
           <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700 mb-1">
-            Job Title 
+            {t('personalInfo.jobTitle')}
           </label>
           <input
             type="text"
@@ -63,14 +65,14 @@ const PersonalInfoForm: React.FC = () => {
             value={formData.jobTitle}
             onChange={handleChange}
             className="form-input"
-            placeholder="e.g., Software Engineer, Marketing Specialist, Recent Graduate"
+            placeholder={t('personalInfo.placeholders.jobTitle')}
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address *
+              {t('personalInfo.email')} *
             </label>
             <input
               type="email"
@@ -79,14 +81,14 @@ const PersonalInfoForm: React.FC = () => {
               value={formData.email}
               onChange={handleChange}
               className="form-input"
-              placeholder="john@example.com"
+              placeholder={t('personalInfo.placeholders.email')}
               required
             />
           </div>
 
           <div className="mb-4">
             <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-              Phone Number *
+              {t('personalInfo.phone')} *
             </label>
             <input
               type="tel"
@@ -95,7 +97,7 @@ const PersonalInfoForm: React.FC = () => {
               value={formData.phone}
               onChange={handleChange}
               className="form-input"
-              placeholder="+1 (555) 123-4567"
+              placeholder={t('personalInfo.placeholders.phone')}
               required
             />
           </div>
@@ -103,7 +105,7 @@ const PersonalInfoForm: React.FC = () => {
 
         <div className="mb-4">
           <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-            Location *
+            {t('personalInfo.location')} *
           </label>
           <input
             type="text"
@@ -112,7 +114,7 @@ const PersonalInfoForm: React.FC = () => {
             value={formData.location}
             onChange={handleChange}
             className="form-input"
-            placeholder="e.g., New York, NY"
+            placeholder={t('personalInfo.placeholders.location')}
             required
           />
         </div>
@@ -120,7 +122,7 @@ const PersonalInfoForm: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="mb-4">
             <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
-              Website / Portfolio (Optional)
+              {t('personalInfo.website')}
             </label>
             <input
               type="url"
@@ -129,13 +131,13 @@ const PersonalInfoForm: React.FC = () => {
               value={formData.website}
               onChange={handleChange}
               className="form-input"
-              placeholder="https://yourportfolio.com"
+              placeholder={t('personalInfo.placeholders.website')}
             />
           </div>
 
           <div className="mb-4">
             <label htmlFor="linkedin" className="block text-sm font-medium text-gray-700 mb-1">
-              LinkedIn Profile (Optional)
+              {t('personalInfo.linkedin')}
             </label>
             <input
               type="url"
@@ -144,7 +146,7 @@ const PersonalInfoForm: React.FC = () => {
               value={formData.linkedin}
               onChange={handleChange}
               className="form-input"
-              placeholder="https://linkedin.com/in/yourprofile"
+              placeholder={t('personalInfo.placeholders.linkedin')}
             />
           </div>
         </div>
@@ -156,7 +158,7 @@ const PersonalInfoForm: React.FC = () => {
             className={`btn-primary flex items-center ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={!isFormValid}
           >
-            Next: Professional Summary
+            {t('personalInfo.nextButton')}
             <ArrowRight className="w-4 h-4 ml-2" />
           </button>
         </div>

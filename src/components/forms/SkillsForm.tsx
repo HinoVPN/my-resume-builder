@@ -1,15 +1,18 @@
 import React, { useState, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Plus, X } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { addSkill, updateSkill, removeSkill } from '../../store/resumeSlice';
-import { type Skill, SKILL_LEVELS } from '../../types/resume';
+import { type Skill, getLocalizedSkillLevels } from '../../types/resume';
 
 const SkillsForm: React.FC = () => {
   const skills = useAppSelector(state => state.resume.skills);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const [newSkillName, setNewSkillName] = useState('');
+  const localizedSkillLevels = getLocalizedSkillLevels(i18n.language);
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -79,16 +82,16 @@ const SkillsForm: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Skills</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('skills.title')}</h2>
         <p className="text-gray-600">
-          List your core skills and rate your proficiency level.
+          {t('skills.subtitle')}
         </p>
       </div>
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Add Skills
+            {t('skills.addSkillsLabel')}
           </label>
           <div className="flex gap-2">
             <input
@@ -97,7 +100,7 @@ const SkillsForm: React.FC = () => {
               onChange={(e) => setNewSkillName(e.target.value)}
               onKeyPress={handleKeyPress}
               className="form-input flex-1"
-              placeholder="Type a skill (e.g., Python, Photoshop, Fluent English) and press Enter or comma"
+              placeholder={t('skills.placeholder')}
             />
             <button
               type="button"
@@ -106,18 +109,18 @@ const SkillsForm: React.FC = () => {
               disabled={!newSkillName.trim()}
             >
               <Plus className="w-4 h-4 mr-1" />
-              Add
+              {t('common.add')}
             </button>
           </div>
           <div className="mt-2 text-sm text-gray-500">
-            <strong>Tip:</strong> Press Enter or comma to add each skill. Include both technical and soft skills.
+            <strong>{t('common.tip')}:</strong> {t('skills.addTip')}
           </div>
         </div>
 
         {skills.length > 0 && (
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Your Skills ({skills.length})
+              {t('skills.yourSkills')} ({skills.length})
             </label>
             <div className="space-y-3">
               {skills.map((skill) => (
@@ -136,22 +139,22 @@ const SkillsForm: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Proficiency Level
+                        {t('skills.skillLevel')}
                       </label>
                       <select
                         value={skill.level}
                         onChange={(e) => updateSkillLevel(skill.id, e.target.value as Skill['level'])}
                         className="form-select"
                       >
-                        {SKILL_LEVELS.map(level => (
-                          <option key={level} value={level}>{level}</option>
+                        {localizedSkillLevels.map((level, index) => (
+                          <option key={level} value={getLocalizedSkillLevels('en')[index]}>{level}</option>
                         ))}
                       </select>
                     </div>
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Years of Experience (Optional)
+                        {t('skills.yearsOfExperiencePlural')} ({t('common.optional')})
                       </label>
                       <input
                         type="number"
@@ -163,18 +166,18 @@ const SkillsForm: React.FC = () => {
                           updateSkillYears(skill.id, years);
                         }}
                         className="form-input"
-                        placeholder="e.g., 3"
+                        placeholder={t('skills.yearsPlaceholder')}
                       />
                     </div>
                   </div>
                   
                   <div className="mt-3 flex items-center space-x-2">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getLevelColor(skill.level)}`}>
-                      {skill.level}
+                      {t(`skills.levels.${skill.level}`)}
                     </span>
                     {skill.years && (
                       <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        {skill.years} year{skill.years !== 1 ? 's' : ''}
+                        {t('skills.yearsOfExperience', { years: skill.years })}
                       </span>
                     )}
                   </div>
@@ -186,31 +189,31 @@ const SkillsForm: React.FC = () => {
 
         {skills.length === 0 && (
           <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-            <p className="text-gray-500 mb-4">No skills added yet</p>
+            <p className="text-gray-500 mb-4">{t('skills.noSkills')}</p>
             <p className="text-sm text-gray-400">
-              Add your first skill using the input field above
+              {t('skills.noSkillsHint')}
             </p>
           </div>
         )}
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
-          <h4 className="font-medium text-blue-900 mb-2">Skill Level Guide:</h4>
+          <h4 className="font-medium text-blue-900 mb-2">{t('skills.levelGuide')}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
             <div className="flex items-center">
               <span className="w-3 h-3 bg-red-100 rounded-full mr-2"></span>
-              <strong>Beginner:</strong> Basic understanding
+              <strong>{t('skills.levels.Beginner')}:</strong> {t('skills.levelDescriptions.beginner')}
             </div>
             <div className="flex items-center">
               <span className="w-3 h-3 bg-yellow-100 rounded-full mr-2"></span>
-              <strong>Intermediate:</strong> Working knowledge
+              <strong>{t('skills.levels.Intermediate')}:</strong> {t('skills.levelDescriptions.intermediate')}
             </div>
             <div className="flex items-center">
               <span className="w-3 h-3 bg-blue-100 rounded-full mr-2"></span>
-              <strong>Advanced:</strong> Highly proficient
+              <strong>{t('skills.levels.Advanced')}:</strong> {t('skills.levelDescriptions.advanced')}
             </div>
             <div className="flex items-center">
               <span className="w-3 h-3 bg-green-100 rounded-full mr-2"></span>
-              <strong>Expert:</strong> Industry recognized expertise
+              <strong>{t('skills.levels.Expert')}:</strong> {t('skills.levelDescriptions.expert')}
             </div>
           </div>
         </div>
@@ -222,13 +225,13 @@ const SkillsForm: React.FC = () => {
             className="btn-secondary flex items-center"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
+            {t('common.back')}
           </button>
           <button 
             type="submit" 
             className="btn-primary flex items-center"
           >
-            Next: Optional Sections
+            {t('skills.nextButton')}
             <ArrowRight className="w-4 h-4 ml-2" />
           </button>
         </div>
