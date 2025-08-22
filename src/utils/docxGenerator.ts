@@ -4,7 +4,6 @@ import type { ResumeData } from '../types/resume';
 import { createHeading, createParagraphsFromHtml, createInstitutionHeader, createSubHeading, createTwoColumnTable, createWorkExperienceTable } from './docxGeneratorUtils';
 import { 
   getLocalizedMonths, 
-  getLocalizedLanguageProficiency, 
   getDocumentConfig
 } from '../types/resume';
 import { COMMON_CONSTANTS } from '../types/commonConstants';
@@ -17,7 +16,6 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
 
   // Localization helpers
   const localizedMonths = getLocalizedMonths(language);
-  const localizedLanguageProficiency = getLocalizedLanguageProficiency(language);
 
   const getLocalizedMonth = (englishMonth: string): string => {
     if (language === 'en') return englishMonth;
@@ -26,12 +24,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
     return index !== -1 ? localizedMonths[index] : englishMonth;
   };
 
-  const getLocalizedProficiency = (englishProficiency: string): string => {
-    if (language === 'en') return englishProficiency;
-    const englishProficiencies = getLocalizedLanguageProficiency('en') as readonly string[];
-    const index = englishProficiencies.indexOf(englishProficiency);
-    return index !== -1 ? localizedLanguageProficiency[index] : englishProficiency;
-  };
+  // Removed getLocalizedProficiency function - no longer needed with remark field
 
   // Header Section - Name
   children.push(
@@ -329,9 +322,11 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
     children.push(createHeading(config.labels.languages));
 
     const languageText = resumeData.optionalSections.languages
-      .map(lang => language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] 
-        ? `${lang.name}（${getLocalizedProficiency(lang.proficiency)}）`
-        : `${lang.name} (${getLocalizedProficiency(lang.proficiency)})`
+      .map(lang => lang.remark 
+        ? (language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] 
+           ? `${lang.name}（${lang.remark}）`
+           : `${lang.name} (${lang.remark})`)
+        : lang.name
       )
       .join(language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? '、' : ', ') + (language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? '' : '.');
     

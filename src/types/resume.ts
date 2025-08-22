@@ -52,7 +52,7 @@ export interface Certificate {
 export interface Language {
   id: string;
   name: string;
-  proficiency: 'Basic' | 'Conversational' | 'Fluent' | 'Native';
+  remark: string;
 }
 
 export interface OptionalSections {
@@ -251,14 +251,7 @@ export const getLocalizedSkillLevels = (language: string) => {
   return language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? SKILL_LEVELS_ZH_TW : SKILL_LEVELS;
 };
 
-export const LANGUAGE_PROFICIENCY = ['Basic', 'Conversational', 'Fluent', 'Native'] as const;
-
-export const LANGUAGE_PROFICIENCY_ZH_TW = ['基礎', '對話', '流利', '母語'] as const;
-
-// Helper function to get localized language proficiency levels
-export const getLocalizedLanguageProficiency = (language: string) => {
-  return language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? LANGUAGE_PROFICIENCY_ZH_TW : LANGUAGE_PROFICIENCY;
-};
+// Language proficiency constants removed - replaced with remark field for flexibility
 
 export const getDocumentConfig = (language: string = 'en'): DocumentConfig => {
   if (language === COMMON_CONSTANTS.LANGUAGE['ZH-TW']) {

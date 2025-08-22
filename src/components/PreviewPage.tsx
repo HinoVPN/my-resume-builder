@@ -205,7 +205,7 @@ const PreviewPage: React.FC = () => {
             
             <div className="flex space-x-3">
               <button
-                onClick={() => navigate('/personal')}
+                onClick={() => navigate('/')}
                 className="btn-secondary flex items-center"
               >
                 <Edit className="w-4 h-4 mr-2" />

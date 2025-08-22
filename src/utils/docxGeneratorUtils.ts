@@ -254,7 +254,8 @@ export const createSkillText = (skillName: string, skillText: string): Paragraph
     });
 };
 
-export const createLanguageHeader = (languageName: string, proficiency: string): Paragraph => {
+// Helper function to create language header with tab stops like the reference
+export const createLanguageHeader = (languageName: string, remark: string): Paragraph => {
     return new Paragraph({
         tabStops: [
         {
@@ -269,7 +270,7 @@ export const createLanguageHeader = (languageName: string, proficiency: string):
             size: 22,
         }),
         new TextRun({
-            text: `\t${proficiency}`,
+            text: `\t${remark}`,
             bold: true,
             size: 22,
         })

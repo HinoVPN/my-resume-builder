@@ -4,18 +4,17 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Plus, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { updateOptionalSections } from '../../store/resumeSlice';
-import { type Certificate, type Language, getLocalizedLanguageProficiency } from '../../types/resume';
+import { type Certificate, type Language } from '../../types/resume';
 
 const OptionalSectionsForm: React.FC = () => {
   const optionalSections = useAppSelector(state => state.resume.optionalSections);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   
   const [hobbies, setHobbies] = useState(optionalSections.hobbies);
   const [certificates, setCertificates] = useState<Certificate[]>(optionalSections.certificates);
   const [languages, setLanguages] = useState<Language[]>(optionalSections.languages);
-  const localizedLanguageProficiency = getLocalizedLanguageProficiency(i18n.language);
   
   const [expandedSections, setExpandedSections] = useState({
     hobbies: true,
@@ -56,7 +55,7 @@ const OptionalSectionsForm: React.FC = () => {
     const newLanguage: Language = {
       id: generateId(),
       name: '',
-      proficiency: 'Conversational'
+      remark: ''
     };
     setLanguages([...languages, newLanguage]);
   };
@@ -65,7 +64,7 @@ const OptionalSectionsForm: React.FC = () => {
     setLanguages(languages.filter(lang => lang.id !== id));
   };
 
-  const updateLanguage = (id: string, field: keyof Language, value: string | Language['proficiency']) => {
+  const updateLanguage = (id: string, field: keyof Language, value: string) => {
     setLanguages(languages.map(lang => 
       lang.id === id ? { ...lang, [field]: value } : lang
     ));
@@ -88,15 +87,7 @@ const OptionalSectionsForm: React.FC = () => {
     navigate('/skills');
   };
 
-  const getProficiencyColor = (proficiency: Language['proficiency']) => {
-    switch (proficiency) {
-      case 'Basic': return 'bg-red-100 text-red-800';
-      case 'Conversational': return 'bg-yellow-100 text-yellow-800';
-      case 'Fluent': return 'bg-blue-100 text-blue-800';
-      case 'Native': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+  // Removed getProficiencyColor function - no longer needed with remark field
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -311,24 +302,16 @@ const OptionalSectionsForm: React.FC = () => {
                         
                         <div className="form-group">
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {t('optional.proficiency')}
+                            {t('optional.remark')}
                           </label>
-                          <select
-                            value={language.proficiency}
-                            onChange={(e) => updateLanguage(language.id, 'proficiency', e.target.value as Language['proficiency'])}
-                            className="form-select"
-                          >
-                            {localizedLanguageProficiency.map((level, index) => (
-                              <option key={level} value={getLocalizedLanguageProficiency('en')[index]}>{level}</option>
-                            ))}
-                          </select>
+                          <input
+                            type="text"
+                            value={language.remark}
+                            onChange={(e) => updateLanguage(language.id, 'remark', e.target.value)}
+                            className="form-input"
+                            placeholder={t('optional.placeholders.remark')}
+                          />
                         </div>
-                      </div>
-                      
-                      <div className="mt-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getProficiencyColor(language.proficiency)}`}>
-                          {t(`optional.proficiencyLevels.${language.proficiency}`)}
-                        </span>
                       </div>
                     </div>
                   ))}
