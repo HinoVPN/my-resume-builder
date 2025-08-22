@@ -71,7 +71,7 @@ const WorkExperienceForm: React.FC = () => {
   const localizedMonths = getLocalizedMonths(i18n.language);
 
   const isFormValid = experiences.length === 0 || experiences.every(exp => 
-    exp.companyName && exp.jobTitle && exp.location && exp.startMonth && exp.startYear && exp.responsibilities &&
+    exp.companyName && exp.jobTitle && exp.startMonth && exp.startYear && exp.responsibilities &&
     (exp.isCurrentJob || (exp.endMonth && exp.endYear))
   );
 
@@ -146,7 +146,7 @@ const WorkExperienceForm: React.FC = () => {
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                                          {t('experience.city')} *
+                  {t('experience.city')}
                   </label>
                   <input
                     type="text"
@@ -154,7 +154,6 @@ const WorkExperienceForm: React.FC = () => {
                     onChange={(e) => updateExperience(experience.id, 'location', e.target.value)}
                     className="form-input"
                     placeholder={t('experience.placeholders.city')}
-                    required
                   />
                 </div>
 

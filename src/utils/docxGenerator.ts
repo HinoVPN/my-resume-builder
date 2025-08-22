@@ -1,11 +1,9 @@
 import { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle, Table, TableRow, TableCell, WidthType, LevelFormat, convertInchesToTwip } from 'docx';
 import { saveAs } from 'file-saver';
 import type { ResumeData } from '../types/resume';
-import { createHeading, createParagraphsFromHtml, createInstitutionHeader, createSubHeading } from './docxGeneratorUtils';
+import { createHeading, createParagraphsFromHtml, createInstitutionHeader, createSubHeading, createTwoColumnTable, createWorkExperienceTable } from './docxGeneratorUtils';
 import { 
   getLocalizedMonths, 
-  getLocalizedSkillLevels, 
-  getLocalizedLanguageProficiency, 
   getDocumentConfig
 } from '../types/resume';
 import { COMMON_CONSTANTS } from '../types/commonConstants';
@@ -18,8 +16,6 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
 
   // Localization helpers
   const localizedMonths = getLocalizedMonths(language);
-  const localizedSkillLevels = getLocalizedSkillLevels(language);
-  const localizedLanguageProficiency = getLocalizedLanguageProficiency(language);
 
   const getLocalizedMonth = (englishMonth: string): string => {
     if (language === 'en') return englishMonth;
@@ -28,19 +24,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
     return index !== -1 ? localizedMonths[index] : englishMonth;
   };
 
-  const getLocalizedSkillLevel = (englishLevel: string): string => {
-    if (language === 'en') return englishLevel;
-    const englishLevels = getLocalizedSkillLevels('en') as readonly string[];
-    const index = englishLevels.indexOf(englishLevel);
-    return index !== -1 ? localizedSkillLevels[index] : englishLevel;
-  };
-
-  const getLocalizedProficiency = (englishProficiency: string): string => {
-    if (language === 'en') return englishProficiency;
-    const englishProficiencies = getLocalizedLanguageProficiency('en') as readonly string[];
-    const index = englishProficiencies.indexOf(englishProficiency);
-    return index !== -1 ? localizedLanguageProficiency[index] : englishProficiency;
-  };
+  // Removed getLocalizedProficiency function - no longer needed with remark field
 
   // Header Section - Name
   children.push(
@@ -95,7 +79,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
         new Paragraph({
           children: [
             new TextRun({
-              text: line.join(' • '),
+              text: line.join(' | '),
               size: 20,
             }),
           ],
@@ -137,113 +121,25 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
             experience.isCurrentJob ? config.labels.present : `${getLocalizedMonth(experience.endMonth)} ${experience.endYear}`
           }`;
 
-      // Work experience table
-      const workExperienceTable = new Table({
-        rows: [
-          new TableRow({
-            children: [
-              new TableCell({
-                children: [
-                  new Paragraph({
-                    children: [
-                      new TextRun({
-                        text: experience.jobTitle,
-                        bold: true,
-                        size: 22,
-                      }),
-                    ],
-                    spacing: {
-                      after: 30,
-                    },
-                  }),
-                ],
-                width: {
-                  size: 65,
-                  type: WidthType.PERCENTAGE,
-                },
-                borders: {
-                  top: { style: BorderStyle.NONE },
-                  bottom: { style: BorderStyle.NONE },
-                  left: { style: BorderStyle.NONE },
-                  right: { style: BorderStyle.NONE },
-                },
-              }),
-              new TableCell({
-                children: [
-                  new Paragraph({
-                    children: [
-                      new TextRun({
-                        text: dateRange,
-                        size: 20,
-                      }),
-                    ],
-                    alignment: AlignmentType.RIGHT,
-                    spacing: {
-                      after: 30,
-                    },
-                  }),
-                ],
-                width: {
-                  size: 35,
-                  type: WidthType.PERCENTAGE,
-                },
-                borders: {
-                  top: { style: BorderStyle.NONE },
-                  bottom: { style: BorderStyle.NONE },
-                  left: { style: BorderStyle.NONE },
-                  right: { style: BorderStyle.NONE },
-                },
-              }),
-            ],
-          }),
-          new TableRow({
-            children: [
-              new TableCell({
-                children: [
-                  new Paragraph({
-                    children: [
-                      new TextRun({
-                        text: `${experience.companyName} • ${experience.location}`,
-                        bold: false,
-                        size: 20,
-                      }),
-                    ],
-                    spacing: {
-                      after: 150,
-                    },
-                  }),
-                ],
-                borders: {
-                  top: { style: BorderStyle.NONE },
-                  bottom: { style: BorderStyle.NONE },
-                  left: { style: BorderStyle.NONE },
-                  right: { style: BorderStyle.NONE },
-                },
-              }),
-            ],
-          }),
-        ],
-        width: {
-          size: 100,
-          type: WidthType.PERCENTAGE,
-        },
-        borders: {
-          top: { style: BorderStyle.NONE },
-          bottom: { style: BorderStyle.NONE },
-          left: { style: BorderStyle.NONE },
-          right: { style: BorderStyle.NONE },
-          insideHorizontal: { style: BorderStyle.NONE },
-          insideVertical: { style: BorderStyle.NONE },
-        },
-      });
-      
-      children.push(workExperienceTable);
-      
+      // Work Experience Table
+      children.push(createWorkExperienceTable(
+        experience.jobTitle,
+        dateRange,
+        experience.companyName,
+        experience.location,
+      ));
+
       // Responsibilities
       if (experience.responsibilities) {
         const responsibilityParagraphs = createParagraphsFromHtml(experience.responsibilities || '');
         children.push(...responsibilityParagraphs);
       }
+
+      children.push(
+        new Paragraph({
+          children: [new TextRun({ text: ' ' })],
+        })
+      );
     });
   }
 
@@ -386,256 +282,30 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
     });
   }
 
+
+
   // Skills
   if (resumeData.skills.length > 0) {
     children.push(createHeading(config.labels.skills));
 
-    const skillRows: TableRow[] = [];
-    
-    // Header row
-    skillRows.push(
-      new TableRow({
-        children: [
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: config.labels.skill,
-                    size: 20,
-                    bold: true,
-                  }),
-                ],
-                alignment: AlignmentType.LEFT,
-              }),
-            ],
-            width: {
-              size: 30,
-              type: WidthType.PERCENTAGE,
-            },
-          }),
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: config.labels.years,
-                    size: 20,
-                    bold: true,
-                  }),
-                ],
-                alignment: AlignmentType.CENTER,
-              }),
-            ],
-            width: {
-              size: 6,
-              type: WidthType.PERCENTAGE,
-            },
-          }),
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: config.labels.level,
-                    size: 20,
-                    bold: true,
-                  }),
-                ],
-                alignment: AlignmentType.CENTER,
-              }),
-            ],
-            width: {
-              size: 14,
-              type: WidthType.PERCENTAGE,
-            },
-          }),
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: config.labels.skill,
-                    size: 20,
-                    bold: true,
-                  }),
-                ],
-                alignment: AlignmentType.LEFT,
-              }),
-            ],
-            width: {
-              size: 30,
-              type: WidthType.PERCENTAGE,
-            },
-          }),
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: config.labels.years,
-                    size: 20,
-                    bold: true,
-                  }),
-                ],
-                alignment: AlignmentType.CENTER,
-              }),
-            ],
-            width: {
-              size: 6,
-              type: WidthType.PERCENTAGE,
-            },
-          }),
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: config.labels.level,
-                    size: 20,
-                    bold: true,
-                  }),
-                ],
-                alignment: AlignmentType.CENTER,
-              }),
-            ],
-            width: {
-              size: 14,
-              type: WidthType.PERCENTAGE,
-            },
-          }),
-        ],
-      })
-    );
-    
-    // Data rows
-    for (let i = 0; i < resumeData.skills.length; i += 2) {
-      const skill1 = resumeData.skills[i];
-      const skill2 = resumeData.skills[i + 1];
-
-      skillRows.push(
-        new TableRow({
-          children: [
-            new TableCell({
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: skill1.name,
-                      size: 20,
-                      color: '000000',
-                    }),
-                  ],
-                }),
-              ],
-              width: {
-                size: 30,
-                type: WidthType.PERCENTAGE,
-              },
-            }),
-            new TableCell({
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: skill1.years ? skill1.years.toString() : '-',
-                      size: 20,
-                      color: '000000',
-                    }),
-                  ],
-                  alignment: AlignmentType.CENTER,
-                }),
-              ],
-              width: {
-                size: 6,
-                type: WidthType.PERCENTAGE,
-              },
-            }),
-            new TableCell({
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: getLocalizedSkillLevel(skill1.level),
-                      size: 20,
-                      color: '000000',
-                    }),
-                  ],
-                  alignment: AlignmentType.CENTER,
-                }),
-              ],
-              width: {
-                size: 14,
-                type: WidthType.PERCENTAGE,
-              },
-            }),
-            new TableCell({
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: skill2?.name || '',
-                      size: 20,
-                      color: '000000',
-                    }),
-                  ],
-                }),
-              ],
-              width: {
-                size: 30,
-                type: WidthType.PERCENTAGE,
-              },
-            }),
-            new TableCell({
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: skill2?.years ? skill2.years.toString() : (skill2 ? '-' : ''),
-                      size: 20,
-                      color: '000000',
-                    }),
-                  ],
-                  alignment: AlignmentType.CENTER,
-                }),
-              ],
-              width: {
-                size: 6,
-                type: WidthType.PERCENTAGE,
-              },
-            }),
-            new TableCell({
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: skill2 ? getLocalizedSkillLevel(skill2.level) : '',
-                      size: 20,
-                      color: '000000',
-                    }),
-                  ],
-                  alignment: AlignmentType.CENTER,
-                }),
-              ],
-              width: {
-                size: 14,
-                type: WidthType.PERCENTAGE,
-              },
-            }),
-          ],
-        })
+    resumeData.skills.forEach((skill) => {
+      // Skill table
+      const skillTable = createTwoColumnTable(
+        skill.name,
+        20,
+        skill.years ? `${skill.years} years` : '-',
+        20,
+        90,
+        WidthType.PERCENTAGE,
+        10,
+        WidthType.PERCENTAGE,
+        100,
+        WidthType.PERCENTAGE
       );
-    }
+  
+      children.push(skillTable);
+    });
 
-    children.push(
-      new Table({
-        rows: skillRows,
-        width: {
-          size: 100,
-          type: WidthType.PERCENTAGE,
-        },
-      })
-    );
   }
 
   // Optional Sections
@@ -652,9 +322,11 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
     children.push(createHeading(config.labels.languages));
 
     const languageText = resumeData.optionalSections.languages
-      .map(lang => language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] 
-        ? `${lang.name}（${getLocalizedProficiency(lang.proficiency)}）`
-        : `${lang.name} (${getLocalizedProficiency(lang.proficiency)})`
+      .map(lang => lang.remark 
+        ? (language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] 
+           ? `${lang.name}（${lang.remark}）`
+           : `${lang.name} (${lang.remark})`)
+        : lang.name
       )
       .join(language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? '、' : ', ') + (language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? '' : '.');
     

@@ -4,42 +4,40 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Plus, X } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { addSkill, updateSkill, removeSkill } from '../../store/resumeSlice';
-import { type Skill, getLocalizedSkillLevels } from '../../types/resume';
+import { type Skill } from '../../types/resume';
 
 const SkillsForm: React.FC = () => {
   const skills = useAppSelector(state => state.resume.skills);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [newSkillName, setNewSkillName] = useState('');
-  const localizedSkillLevels = getLocalizedSkillLevels(i18n.language);
+
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
 
   const addNewSkill = (skillName: string) => {
-    if (skillName.trim() && !skills.find(skill => skill.name.toLowerCase() === skillName.toLowerCase())) {
+    //if the skill string is contains comma, split it into multiple skills
+    //if the skill repeat, don't add it
+    const skillNames = skillName.split(',');
+    skillNames.forEach(name => {
+      if (name.trim() && !skills.find(skill => skill.name.toLowerCase().trim() === name.toLowerCase().trim())) {
       const newSkill: Skill = {
         id: generateId(),
-        name: skillName.trim(),
-        level: 'Intermediate',
+        name: name.trim(),
         years: undefined
       };
       dispatch(addSkill(newSkill));
-      setNewSkillName('');
-    }
+        setNewSkillName('');
+      }
+    });
   };
 
   const removeSkillItem = (id: string) => {
     dispatch(removeSkill(id));
   };
 
-  const updateSkillLevel = (id: string, level: Skill['level']) => {
-    const skill = skills.find(s => s.id === id);
-    if (skill) {
-      const updatedSkill = { ...skill, level };
-      dispatch(updateSkill({ id, data: updatedSkill }));
-    }
-  };
+
 
   const updateSkillYears = (id: string, years: number | undefined) => {
     const skill = skills.find(s => s.id === id);
@@ -69,15 +67,7 @@ const SkillsForm: React.FC = () => {
     navigate('/education');
   };
 
-  const getLevelColor = (level: Skill['level']) => {
-    switch (level) {
-      case 'Beginner': return 'bg-red-100 text-red-800';
-      case 'Intermediate': return 'bg-yellow-100 text-yellow-800';
-      case 'Advanced': return 'bg-blue-100 text-blue-800';
-      case 'Expert': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -122,67 +112,94 @@ const SkillsForm: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-3">
               {t('skills.yourSkills')} ({skills.length})
             </label>
-            <div className="space-y-3">
-              {skills.map((skill) => (
-                <div key={skill.id} className="bg-gray-50 p-4 rounded-lg">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-medium text-gray-900 text-lg">{skill.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeSkillItem(skill.id)}
-                      className="text-red-600 hover:text-red-800 p-1"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {t('skills.skillLevel')}
-                      </label>
-                      <select
-                        value={skill.level}
-                        onChange={(e) => updateSkillLevel(skill.id, e.target.value as Skill['level'])}
-                        className="form-select"
-                      >
-                        {localizedSkillLevels.map((level, index) => (
-                          <option key={level} value={getLocalizedSkillLevels('en')[index]}>{level}</option>
-                        ))}
-                      </select>
+            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+              {/* Desktop Table Header */}
+              <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-700">
+                <div className="col-span-6">{t('skills.skillName')}</div>
+                <div className="col-span-4">{t('skills.yearsOfExperiencePlural')}</div>
+                <div className="col-span-2 text-center">{t('common.actions')}</div>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {skills.map((skill) => (
+                  <div key={skill.id} className="px-4 py-4 hover:bg-gray-50 transition-colors">
+                    {/* Desktop Layout */}
+                    <div className="hidden md:grid grid-cols-12 gap-4 items-center">
+                      <div className="col-span-6">
+                        <span className="font-medium text-gray-900">{skill.name}</span>
+                      </div>
+                      <div className="col-span-4">
+                        <div className="relative w-full">
+                          <input
+                            type="number"
+                            min="0"
+                            max="50"
+                            value={skill.years || ''}
+                            onChange={(e) => {
+                              const years = e.target.value ? parseInt(e.target.value) : undefined;
+                              updateSkillYears(skill.id, years);
+                            }}
+                            className="form-input w-full text-sm pr-12"
+                            placeholder="0"
+                          />
+                          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
+                            {t('common.years')}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="col-span-2 flex items-center justify-center">
+                        <button
+                          type="button"
+                          onClick={() => removeSkillItem(skill.id)}
+                          className="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-md transition-colors"
+                          title={t('skills.removeSkill')}
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {t('skills.yearsOfExperiencePlural')} ({t('common.optional')})
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="50"
-                        value={skill.years || ''}
-                        onChange={(e) => {
-                          const years = e.target.value ? parseInt(e.target.value) : undefined;
-                          updateSkillYears(skill.id, years);
-                        }}
-                        className="form-input"
-                        placeholder={t('skills.yearsPlaceholder')}
-                      />
+                    {/* Mobile Layout */}
+                    <div className="md:hidden">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-medium text-gray-900 text-lg">{skill.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeSkillItem(skill.id)}
+                          className="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-md transition-colors"
+                          title={t('skills.removeSkill')}
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          {t('skills.yearsOfExperiencePlural')} ({t('common.optional')})
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min="0"
+                            max="50"
+                            value={skill.years || ''}
+                            onChange={(e) => {
+                              const years = e.target.value ? parseInt(e.target.value) : undefined;
+                              updateSkillYears(skill.id, years);
+                            }}
+                            className="form-input w-full pr-12"
+                            placeholder="0"
+                          />
+                          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            {t('common.years')}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="mt-3 flex items-center space-x-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getLevelColor(skill.level)}`}>
-                      {t(`skills.levels.${skill.level}`)}
-                    </span>
-                    {skill.years && (
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        {t('skills.yearsOfExperience', { years: skill.years })}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+            <div className="mt-2 text-sm text-gray-500">
+              <strong>{t('common.tip')}:</strong> {t('skills.yearsOptionalHint')}
             </div>
           </div>
         )}
@@ -196,27 +213,7 @@ const SkillsForm: React.FC = () => {
           </div>
         )}
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
-          <h4 className="font-medium text-blue-900 mb-2">{t('skills.levelGuide')}</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-            <div className="flex items-center">
-              <span className="w-3 h-3 bg-red-100 rounded-full mr-2"></span>
-              <strong>{t('skills.levels.Beginner')}:</strong> {t('skills.levelDescriptions.beginner')}
-            </div>
-            <div className="flex items-center">
-              <span className="w-3 h-3 bg-yellow-100 rounded-full mr-2"></span>
-              <strong>{t('skills.levels.Intermediate')}:</strong> {t('skills.levelDescriptions.intermediate')}
-            </div>
-            <div className="flex items-center">
-              <span className="w-3 h-3 bg-blue-100 rounded-full mr-2"></span>
-              <strong>{t('skills.levels.Advanced')}:</strong> {t('skills.levelDescriptions.advanced')}
-            </div>
-            <div className="flex items-center">
-              <span className="w-3 h-3 bg-green-100 rounded-full mr-2"></span>
-              <strong>{t('skills.levels.Expert')}:</strong> {t('skills.levelDescriptions.expert')}
-            </div>
-          </div>
-        </div>
+
 
         <div className="flex justify-between mt-8">
           <button 

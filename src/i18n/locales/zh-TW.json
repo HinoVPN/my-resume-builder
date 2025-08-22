@@ -55,7 +55,7 @@
     "experienceNumber": "經歷 #{{number}}",
     "company": "公司名稱",
     "position": "職位名稱",
-    "city": "所在地點",
+    "city": "所在地點（選填）",
     "employmentPeriod": "任職期間",
     "startMonth": "開始月份",
     "startYear": "開始年份",
@@ -136,7 +136,10 @@
       "expert": "業界認可的專業知識"
     },
     "placeholder": "輸入技能（例如：Python、Photoshop、流利英文）並按 Enter 或逗號",
-    "nextButton": "下一步：其他資訊"
+    "nextButton": "下一步：其他資訊",
+    "skillName": "技能名稱",
+    "removeSkill": "移除技能",
+    "yearsOptionalHint": "經驗年數是選填的，留空表示不顯示年數"
   },
   "optional": {
     "title": "其他資訊",
@@ -157,19 +160,14 @@
     "addLanguage": "新增語言",
     "addAnotherLanguage": "新增另一種語言",
     "languageName": "語言",
-    "proficiency": "熟練程度",
-    "proficiencyLevels": {
-      "Basic": "基礎",
-      "Conversational": "對話",
-      "Fluent": "流利",
-      "Native": "母語"
-    },
+    "remark": "備註 / 程度",
     "placeholders": {
       "hobbies": "例如：攝影、爬山、彈吉他、閱讀、志工工作",
       "certificateName": "例如：AWS 認證解決方案架構師",
       "issuingOrganization": "例如：Amazon Web Services",
       "dateObtained": "例如：2024年3月、2024",
-      "languageName": "例如：西班牙文、中文、法文"
+      "languageName": "例如：西班牙文、中文、法文",
+      "remark": "例如：母語、流利、日語N1、對話程度"
     },
     "previewButton": "預覽履歷"
   },
@@ -228,7 +226,9 @@
     "back": "返回",
     "tip": "提示",
     "select": "選擇",
-    "text": "文字檔"
+    "text": "文字檔",
+    "actions": "操作",
+    "years": "年"
   },
   "language": {
     "switch": "語言",

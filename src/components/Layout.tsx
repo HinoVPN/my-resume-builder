@@ -17,8 +17,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
+          <div className="flex justify-between lg:items-start lg:flex-row flex-col flex-wrap items-center">
+            <div className="flex-1 ">
               <h1 className="text-3xl font-bold text-gray-900 text-center">
                 {t('app.title')}
               </h1>
@@ -26,7 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {t('app.subtitle')}
               </p>
             </div>
-            <div className="ml-4">
+            <div className="ml-4 mt-2 lg:mt-0">
               <LanguageSwitcher />
             </div>
           </div>
