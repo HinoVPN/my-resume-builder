@@ -1,12 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Download, Edit, RefreshCw } from 'lucide-react';
 import { useAppSelector } from '../hooks/redux';
 import { renderAsync } from 'docx-preview';
 import { COMMON_CONSTANTS } from '../types/commonConstants';
-import { generateDocx } from '../utils/docxGenerator';
-import { generateDocxBlob } from '../utils/docxGenerator';
+import { generateDocx, generateDocxBlob } from '../utils/docxGenerator';
+import type { ResumeData } from '../types/resume';
+
 
 const PreviewPage: React.FC = () => {
   const resumeData = useAppSelector(state => state.resume);
@@ -16,16 +17,16 @@ const PreviewPage: React.FC = () => {
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
   const [previewGenerated, setPreviewGenerated] = useState(false);
 
-  const generateDocxBlobPreview = async (resumeData: any): Promise<Blob> => {
+  const generateDocxBlobPreview = useCallback(async (resumeData: ResumeData): Promise<Blob> => {
       // We'll create new functions that return blobs instead of downloading
       if (i18n.language === COMMON_CONSTANTS.LANGUAGE['ZH-TW']) {
         return await generateDocxBlob(resumeData, COMMON_CONSTANTS.LANGUAGE['ZH-TW']);
       } else {
         return await generateDocxBlob(resumeData, COMMON_CONSTANTS.LANGUAGE['EN']);
       }
-  };
+  }, [i18n.language]);
 
-  const generatePreview = async (isLanguageChange: boolean = false) => {
+  const generatePreview = useCallback(async (isLanguageChange: boolean = false) => {
     if (!docxPreviewRef.current) return;
     
     setIsGeneratingPreview(true);
@@ -103,12 +104,12 @@ const PreviewPage: React.FC = () => {
     } finally {
       setIsGeneratingPreview(false);
     }
-  };
+  }, [resumeData, i18n.language, generateDocxBlobPreview]);
 
   // Auto-generate preview when component mounts, data changes, or language changes
   useEffect(() => {
     generatePreview();
-  }, [resumeData, i18n.language]);
+  }, [generatePreview]);
 
   const handleDownloadDocx = async () => {
     try {
@@ -174,15 +175,6 @@ const PreviewPage: React.FC = () => {
   //     alert(i18n.language === 'zh-TW' ? 'PDF 生成失敗，請稍後再試' : 'Failed to generate PDF. Please try again.');
   //   }
   // };
-
-  {isGeneratingPreview && (
-    <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
-      <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mr-3" />
-      <span className="text-lg text-gray-700">
-        {i18n.language === 'zh-TW' ? '正在生成預覽...' : 'Generating preview...'}
-      </span>
-    </div>
-    )}
 
   return (
     <div className="min-h-screen bg-gray-50">

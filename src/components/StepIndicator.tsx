@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle } from 'lucide-react';
 
-const getSteps = (t: any) => [
+const getSteps = () => [
   { path: '/', labelKey: 'steps.personalInfo', step: 1 },
   { path: '/summary', labelKey: 'steps.summary', step: 2 },
   { path: '/experience', labelKey: 'steps.experience', step: 3 },
@@ -16,7 +16,7 @@ const getSteps = (t: any) => [
 const StepIndicator: React.FC = () => {
   const location = useLocation();
   const { t } = useTranslation();
-  const steps = getSteps(t);
+  const steps = getSteps();
   const currentStepIndex = steps.findIndex(step => step.path === location.pathname);
 
   return (

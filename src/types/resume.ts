@@ -1,3 +1,5 @@
+import { COMMON_CONSTANTS } from "./commonConstants";
+
 // Resume data types
 export interface PersonalInfo {
   fullName: string;
@@ -189,7 +191,7 @@ export const SCHOOL_TYPES_ZH_TW = [
 ];
 
 export interface DocumentConfig {
-  language: 'en' | 'zh-TW';
+  language: string;
   labels: {
     yourName: string;
     email: string;
@@ -213,27 +215,27 @@ export interface DocumentConfig {
 
 // Helper functions
 export const getLocalizedEducationLevels = (language: string) => {
-  return language === 'zh-TW' ? EDUCATION_LEVELS_ZH_TW : EDUCATION_LEVELS;
+  return language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? EDUCATION_LEVELS_ZH_TW : EDUCATION_LEVELS;
 };
 
 export const getLocalizedHonoursClassifications = (language: string) => {
-  return language === 'zh-TW' ? HONOURS_CLASSIFICATIONS_ZH_TW : HONOURS_CLASSIFICATIONS;
+  return language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? HONOURS_CLASSIFICATIONS_ZH_TW : HONOURS_CLASSIFICATIONS;
 };
 
 export const getLocalizedBachelorDegreeTypes = (language: string) => {
-  return language === 'zh-TW' ? BACHELOR_DEGREE_TYPES_ZH_TW : BACHELOR_DEGREE_TYPES;
+  return language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? BACHELOR_DEGREE_TYPES_ZH_TW : BACHELOR_DEGREE_TYPES;
 };
 
 export const getLocalizedMasterDegreeTypes = (language: string) => {
-  return language === 'zh-TW' ? MASTER_DEGREE_TYPES_ZH_TW : MASTER_DEGREE_TYPES;
+  return language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? MASTER_DEGREE_TYPES_ZH_TW : MASTER_DEGREE_TYPES;
 };
 
 export const getLocalizedDoctorateDegreeTypes = (language: string) => {
-  return language === 'zh-TW' ? DOCTORATE_DEGREE_TYPES_ZH_TW : DOCTORATE_DEGREE_TYPES;
+  return language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? DOCTORATE_DEGREE_TYPES_ZH_TW : DOCTORATE_DEGREE_TYPES;
 };
 
 export const getLocalizedSchoolTypes = (language: string) => {
-  return language === 'zh-TW' ? SCHOOL_TYPES_ZH_TW : SCHOOL_TYPES;
+  return language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? SCHOOL_TYPES_ZH_TW : SCHOOL_TYPES;
 };
 
 // Legacy support - keep old function names for backward compatibility
@@ -247,7 +249,7 @@ export const SKILL_LEVELS_ZH_TW = ['初學', '中等', '熟練', '專家'] as co
 
 // Helper function to get localized skill levels
 export const getLocalizedSkillLevels = (language: string) => {
-  return language === 'zh-TW' ? SKILL_LEVELS_ZH_TW : SKILL_LEVELS;
+  return language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? SKILL_LEVELS_ZH_TW : SKILL_LEVELS;
 };
 
 export const LANGUAGE_PROFICIENCY = ['Basic', 'Conversational', 'Fluent', 'Native'] as const;
@@ -256,13 +258,13 @@ export const LANGUAGE_PROFICIENCY_ZH_TW = ['基礎', '對話', '流利', '母語
 
 // Helper function to get localized language proficiency levels
 export const getLocalizedLanguageProficiency = (language: string) => {
-  return language === 'zh-TW' ? LANGUAGE_PROFICIENCY_ZH_TW : LANGUAGE_PROFICIENCY;
+  return language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? LANGUAGE_PROFICIENCY_ZH_TW : LANGUAGE_PROFICIENCY;
 };
 
-export const getDocumentConfig = (language: String = 'en'): DocumentConfig => {
-  if (language === 'zh-TW') {
+export const getDocumentConfig = (language: string = 'en'): DocumentConfig => {
+  if (language === COMMON_CONSTANTS.LANGUAGE['ZH-TW']) {
     return {
-      language: 'zh-TW',
+      language: COMMON_CONSTANTS.LANGUAGE['ZH-TW'],
       labels: {
         yourName: '您的姓名',
         email: '電子郵件：',
@@ -285,7 +287,7 @@ export const getDocumentConfig = (language: String = 'en'): DocumentConfig => {
     };
   } else {
     return {
-      language: 'en',
+      language: COMMON_CONSTANTS.LANGUAGE['EN'],
       labels: {
         yourName: 'Your Name',
         email: 'Email: ',

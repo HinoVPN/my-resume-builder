@@ -28,7 +28,7 @@ const PersonalInfoForm: React.FC = () => {
     navigate('/summary');
   };
 
-  const isFormValid = formData.fullName && formData.email && formData.phone && formData.location;
+  const isFormValid = formData.fullName && formData.email && formData.phone;
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -105,7 +105,7 @@ const PersonalInfoForm: React.FC = () => {
 
         <div className="mb-4">
           <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-            {t('personalInfo.location')} *
+            {t('personalInfo.location')}
           </label>
           <input
             type="text"
@@ -115,7 +115,6 @@ const PersonalInfoForm: React.FC = () => {
             onChange={handleChange}
             className="form-input"
             placeholder={t('personalInfo.placeholders.location')}
-            required
           />
         </div>
 

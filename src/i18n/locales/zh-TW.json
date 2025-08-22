@@ -26,7 +26,7 @@
     "jobTitle": "職業頭銜",
     "email": "電子郵件",
     "phone": "電話號碼",
-    "location": "所在地",
+    "location": "所在地（選填）",
     "website": "個人網站/作品集（選填）",
     "linkedin": "LinkedIn 個人資料（選填）",
     "placeholders": {

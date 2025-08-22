@@ -38,15 +38,17 @@ const EducationForm: React.FC = () => {
     setEducations(educations.filter(edu => edu.id !== id));
   };
 
-  const updateEducationField = (id: string, field: keyof Education, value: any) => {
+  const updateEducationField = <K extends keyof Education>(id: string, field: K, value: Education[K]) => {
     setEducations(educations.map(edu => 
       edu.id === id 
         ? { 
             ...edu, 
             [field]: value,
-            // Ensure isCurrentStudy is always defined
-            isCurrentStudy: field === 'isCurrentStudy' ? value : (edu.isCurrentStudy || false)
-          }
+            // Clear end date if currently studying
+            ...(field === 'isCurrentStudy' && value === true 
+              ? { endMonth: '', endYear: '' } 
+              : {})
+          } 
         : edu
     ));
   };

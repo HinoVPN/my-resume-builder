@@ -26,7 +26,7 @@
     "jobTitle": "Job Title",
     "email": "Email Address",
     "phone": "Phone Number",
-    "location": "Location",
+    "location": "Location (Optional)",
     "website": "Website / Portfolio (Optional)",
     "linkedin": "LinkedIn Profile (Optional)",
     "placeholders": {

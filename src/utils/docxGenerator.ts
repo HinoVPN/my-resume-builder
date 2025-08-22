@@ -8,6 +8,7 @@ import {
   getLocalizedLanguageProficiency, 
   getDocumentConfig
 } from '../types/resume';
+import { COMMON_CONSTANTS } from '../types/commonConstants';
 
 export const createDocument = (resumeData: ResumeData, language: string = 'en') => {
   console.log(`Starting ${language} DOCX generation...`, resumeData);
@@ -128,7 +129,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
 
     resumeData.workExperiences.forEach((experience) => {
       // Format date range based on language
-      const dateRange = language === 'zh-TW' 
+      const dateRange = language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] 
         ? `${experience.startYear}年 ${getLocalizedMonth(experience.startMonth)} - ${
             experience.isCurrentJob ? config.labels.present : `${experience.endYear}年 ${getLocalizedMonth(experience.endMonth)}`
           }`
@@ -152,7 +153,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
                       }),
                     ],
                     spacing: {
-                      after: language === 'zh-TW' ? 50 : 30,
+                      after: 30,
                     },
                   }),
                 ],
@@ -178,7 +179,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
                     ],
                     alignment: AlignmentType.RIGHT,
                     spacing: {
-                      after: language === 'zh-TW' ? 50 : 30,
+                      after: 30,
                     },
                   }),
                 ],
@@ -254,7 +255,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
       // Format date range based on language
       const dateRange = (() => {
         if (edu.startMonth && edu.startYear) {
-          if (language === 'zh-TW') {
+          if (language === COMMON_CONSTANTS.LANGUAGE['ZH-TW']) {
             const start = `${edu.startYear}年 ${getLocalizedMonth(edu.startMonth)}`;
             if (edu.isCurrentStudy) {
               return `${start} - 目前`;
@@ -651,11 +652,11 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
     children.push(createHeading(config.labels.languages));
 
     const languageText = resumeData.optionalSections.languages
-      .map(lang => language === 'zh-TW' 
+      .map(lang => language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] 
         ? `${lang.name}（${getLocalizedProficiency(lang.proficiency)}）`
         : `${lang.name} (${getLocalizedProficiency(lang.proficiency)})`
       )
-      .join(language === 'zh-TW' ? '、' : ', ') + (language === 'zh-TW' ? '' : '.');
+      .join(language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? '、' : ', ') + (language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? '' : '.');
     
     children.push(
       new Paragraph({
@@ -757,10 +758,10 @@ export const generateDocx = async (resumeData: ResumeData, language: string = 'e
     console.log('Blob created, size:', blob.size);
     
     const fileName = resumeData.personalInfo.fullName 
-      ? language === 'zh-TW'
+      ? language === COMMON_CONSTANTS.LANGUAGE['ZH-TW']
         ? `${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_履歷.docx`
         : `${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_Resume.docx`
-      : language === 'zh-TW' ? '我的履歷.docx' : 'My_Resume.docx';
+      : language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? '我的履歷.docx' : 'My_Resume.docx';
     
     console.log('Downloading file:', fileName);
     
