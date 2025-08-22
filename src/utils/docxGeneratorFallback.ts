@@ -66,10 +66,41 @@ export const generatePlainTextResume = (resumeData: ResumeData): string => {
     content += '-'.repeat(9) + '\n';
     
     resumeData.education.forEach((edu) => {
-      content += `${edu.degree} in ${edu.major}\n`;
-      content += `${edu.schoolName} | ${edu.startYear} - ${edu.endYear}\n`;
-      if (edu.additionalInfo) {
-        content += `${edu.additionalInfo}\n`;
+      // Handle new education structure
+      const degreeText = (() => {
+        if (edu.degreeType && edu.fieldOfStudy) {
+          let text = `${edu.degreeType} in ${edu.fieldOfStudy}`;
+          if (edu.honoursClassification && edu.honoursClassification !== 'None') {
+            text += ` with ${edu.honoursClassification}`;
+          }
+          return text;
+        }
+        // Fallback for legacy structure
+        const degree = (edu as any).degree || edu.educationLevel;
+        const major = (edu as any).major || edu.fieldOfStudy;
+        return `${degree} in ${major}`;
+      })();
+      content += `${degreeText}\n`;
+      // Handle date range
+      const dateRange = (() => {
+        if (edu.startMonth && edu.startYear) {
+          const start = `${edu.startMonth} ${edu.startYear}`;
+          if (edu.isCurrentlyEnrolled) {
+            return `${start} - Present`;
+          } else if (edu.endMonth && edu.endYear) {
+            return `${start} - ${edu.endMonth} ${edu.endYear}`;
+          } else {
+            return `${edu.startYear} - ${edu.endYear}`;
+          }
+        }
+        return `${edu.startYear} - ${edu.endYear}`;
+      })();
+      content += `${edu.schoolName} | ${dateRange}\n`;
+      
+      // Handle description
+      const description = edu.description || (edu as any).additionalInfo;
+      if (description) {
+        content += `${description.replace(/<[^>]*>/g, '')}\n`;
       }
       content += '\n';
     });

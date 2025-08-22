@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Plus, Trash2 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { addWorkExperience, updateWorkExperience, removeWorkExperience } from '../../store/resumeSlice';
-import { type WorkExperience, MONTHS } from '../../types/resume';
+import { type WorkExperience, getLocalizedMonths } from '../../types/resume';
 import RichTextEditor from '../common/RichTextEditor';
 
 const WorkExperienceForm: React.FC = () => {
   const workExperiences = useAppSelector(state => state.resume.workExperiences);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const [experiences, setExperiences] = useState<WorkExperience[]>(workExperiences);
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -66,6 +68,7 @@ const WorkExperienceForm: React.FC = () => {
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 50 }, (_, i) => (currentYear - i).toString());
+  const localizedMonths = getLocalizedMonths(i18n.language);
 
   const isFormValid = experiences.length === 0 || experiences.every(exp => 
     exp.companyName && exp.jobTitle && exp.location && exp.startMonth && exp.startYear && exp.responsibilities &&
@@ -75,23 +78,23 @@ const WorkExperienceForm: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Work Experience</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('experience.title')}</h2>
         <p className="text-gray-600">
-          The heart of your resume. Focus on achievements rather than just responsibilities.
+          {t('experience.subtitle')}
         </p>
       </div>
 
       <form onSubmit={handleSubmit}>
         {experiences.length === 0 ? (
           <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-            <p className="text-gray-500 mb-4">No work experience added yet</p>
+            <p className="text-gray-500 mb-4">{t('experience.noExperience')}</p>
             <button
               type="button"
               onClick={addExperience}
               className="btn-primary flex items-center mx-auto"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Add Work Experience
+              {t('experience.addButton')}
             </button>
           </div>
         ) : (
@@ -100,7 +103,7 @@ const WorkExperienceForm: React.FC = () => {
               <div key={experience.id} className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">
-                    Experience #{index + 1}
+                    {t('experience.experienceNumber', { number: index + 1 })}
                   </h3>
                   <button
                     type="button"
@@ -108,35 +111,35 @@ const WorkExperienceForm: React.FC = () => {
                     className="btn-danger flex items-center text-sm"
                   >
                     <Trash2 className="w-4 h-4 mr-1" />
-                    Remove
+                    {t('common.remove')}
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Company Name *
+                      {t('experience.company')} *
                     </label>
                     <input
                       type="text"
                       value={experience.companyName}
                       onChange={(e) => updateExperience(experience.id, 'companyName', e.target.value)}
                       className="form-input"
-                      placeholder="e.g., Google Inc."
+                      placeholder={t('experience.placeholders.company')}
                       required
                     />
                   </div>
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Job Title *
+                      {t('experience.position')} *
                     </label>
                     <input
                       type="text"
                       value={experience.jobTitle}
                       onChange={(e) => updateExperience(experience.id, 'jobTitle', e.target.value)}
                       className="form-input"
-                      placeholder="e.g., Senior Software Engineer"
+                      placeholder={t('experience.placeholders.position')}
                       required
                     />
                   </div>
@@ -144,53 +147,53 @@ const WorkExperienceForm: React.FC = () => {
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Location *
+                                          {t('experience.city')} *
                   </label>
                   <input
                     type="text"
                     value={experience.location}
                     onChange={(e) => updateExperience(experience.id, 'location', e.target.value)}
                     className="form-input"
-                    placeholder="e.g., San Francisco, CA"
+                    placeholder={t('experience.placeholders.city')}
                     required
                   />
                 </div>
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Employment Period *
+                                          {t('experience.employmentPeriod')} *
                   </label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Start Month</label>
+                      <label className="block text-xs text-gray-500 mb-1">{t('experience.startMonth')}</label>
                       <select
                         value={experience.startMonth}
                         onChange={(e) => updateExperience(experience.id, 'startMonth', e.target.value)}
                         className="form-select"
                         required
                       >
-                        <option value="">Select</option>
-                        {MONTHS.map(month => (
-                          <option key={month} value={month}>{month}</option>
+                        <option value="">{t('common.select')}</option>
+                        {localizedMonths.map((month, index) => (
+                          <option key={month} value={getLocalizedMonths('en')[index]}>{month}</option>
                         ))}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Start Year</label>
+                      <label className="block text-xs text-gray-500 mb-1">{t('experience.startYear')}</label>
                       <select
                         value={experience.startYear}
                         onChange={(e) => updateExperience(experience.id, 'startYear', e.target.value)}
                         className="form-select"
                         required
                       >
-                        <option value="">Select</option>
+                        <option value="">{t('common.select')}</option>
                         {years.map(year => (
                           <option key={year} value={year}>{year}</option>
                         ))}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">End Month</label>
+                      <label className="block text-xs text-gray-500 mb-1">{t('experience.endMonth')}</label>
                       <select
                         value={experience.endMonth}
                         onChange={(e) => updateExperience(experience.id, 'endMonth', e.target.value)}
@@ -198,14 +201,14 @@ const WorkExperienceForm: React.FC = () => {
                         required={!experience.isCurrentJob}
                         disabled={experience.isCurrentJob}
                       >
-                        <option value="">Select</option>
-                        {MONTHS.map(month => (
-                          <option key={month} value={month}>{month}</option>
+                        <option value="">{t('common.select')}</option>
+                        {localizedMonths.map((month, index) => (
+                          <option key={month} value={getLocalizedMonths('en')[index]}>{month}</option>
                         ))}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">End Year</label>
+                      <label className="block text-xs text-gray-500 mb-1">{t('experience.endYear')}</label>
                       <select
                         value={experience.endYear}
                         onChange={(e) => updateExperience(experience.id, 'endYear', e.target.value)}
@@ -213,7 +216,7 @@ const WorkExperienceForm: React.FC = () => {
                         required={!experience.isCurrentJob}
                         disabled={experience.isCurrentJob}
                       >
-                        <option value="">Select</option>
+                        <option value="">{t('common.select')}</option>
                         {years.map(year => (
                           <option key={year} value={year}>{year}</option>
                         ))}
@@ -242,24 +245,24 @@ const WorkExperienceForm: React.FC = () => {
                         }}
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
-                      <span className="ml-2 text-sm text-gray-700">I currently work here</span>
+                      <span className="ml-2 text-sm text-gray-700">{t('experience.currentJob')}</span>
                     </label>
                   </div>
                 </div>
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Responsibilities & Achievements *
+                    {t('experience.responsibilities')} *
                   </label>
                   <RichTextEditor
                     value={experience.responsibilities}
                     onChange={(content) => updateExperience(experience.id, 'responsibilities', content)}
-                    placeholder="Use bullet points starting with action verbs. Quantify your achievements when possible."
+                    placeholder={t('experience.placeholders.responsibilities')}
                     height={180}
                     required={true}
                   />
                   <div className="mt-2 text-sm text-gray-500">
-                    <strong>Tip:</strong> Start with action verbs and use **bold** to highlight key metrics and achievements.
+                    <strong>{t('common.tip')}:</strong> {t('experience.tip')}
                   </div>
                 </div>
               </div>
@@ -272,7 +275,7 @@ const WorkExperienceForm: React.FC = () => {
                 className="btn-secondary flex items-center mx-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Add Another Experience
+                {t('experience.addAnotherButton')}
               </button>
             </div>
           </>
@@ -285,14 +288,14 @@ const WorkExperienceForm: React.FC = () => {
             className="btn-secondary flex items-center"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
+            {t('common.back')}
           </button>
           <button 
             type="submit" 
             className={`btn-primary flex items-center ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={!isFormValid}
           >
-            Next: Education
+            {t('experience.nextButton')}
             <ArrowRight className="w-4 h-4 ml-2" />
           </button>
         </div>

@@ -1,6 +1,7 @@
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle, Table, TableRow, TableCell, WidthType, TabStopPosition, TabStopType, LevelFormat, convertInchesToTwip } from 'docx';
 import { saveAs } from 'file-saver';
 import type { ResumeData } from '../types/resume';
+// Note: For English version, we don't need localization functions but keep imports for consistency
 
 // Enhanced HTML parser for complex TinyMCE content
 const parseHtmlContent = (html: string): Array<{content: string, type: 'paragraph' | 'bullet' | 'numbered', level: number, alignment?: string, formatting?: Array<{text: string, bold?: boolean, italic?: boolean, underline?: boolean}>}> => {
@@ -226,18 +227,43 @@ const createInstitutionHeader = (institutionName: string, dateText: string): Par
     ],
     spacing: {
       before: 200,
-      after: 100,
+      after: 30,
+    },
+  });
+};
+
+const createLanguageHeader = (languageName: string, proficiency: string): Paragraph => {
+  return new Paragraph({
+    tabStops: [
+      {
+        type: TabStopType.RIGHT,
+        position: TabStopPosition.MAX
+      }
+    ],
+    children: [
+      new TextRun({
+        text: languageName,
+        bold: true,
+        size: 22,
+      }),
+      new TextRun({
+        text: `\t${proficiency}`,
+        bold: true,
+        size: 22,
+      })
+    ],
+    spacing: {
+      after: 30,
     },
   });
 };
 
 // Helper function to create role text
-const createRoleText = (roleText: string): Paragraph => {
+const createSubHeading = (text: string): Paragraph => {
   return new Paragraph({
     children: [
       new TextRun({
-        text: roleText,
-        italics: true,
+        text: text,
         size: 20,
       })
     ],
@@ -246,6 +272,7 @@ const createRoleText = (roleText: string): Paragraph => {
     },
   });
 };
+
 
 // Helper function to create headings with thematic break
 const createHeading = (text: string): Paragraph => {
@@ -368,12 +395,16 @@ const createParagraphsFromHtml = (html: string): Paragraph[] => {
   return paragraphs;
 };
 
-export const generateDocx = async (resumeData: ResumeData) => {
-  try {
-    console.log('Starting DOCX generation...', resumeData);
+const createDocument = (resumeData: ResumeData) => {
+  console.log('Starting DOCX generation...', resumeData);
     
     // Create sections array for the document
     const children: (Paragraph | Table)[] = [];
+
+    // Helper function to get localized month (for English, returns as-is)
+    const getLocalizedMonth = (englishMonth: string): string => {
+      return englishMonth; // For English version, keep months as-is
+    };
 
     // Header Section
     children.push(
@@ -461,7 +492,7 @@ export const generateDocx = async (resumeData: ResumeData) => {
             bottom: {
               color: 'auto',
               space: 1,
-              style: BorderStyle.SINGLE,
+              style: BorderStyle.NONE,
               size: 6,
             },
           },
@@ -487,7 +518,7 @@ export const generateDocx = async (resumeData: ResumeData) => {
             bottom: {
               color: 'auto',
               space: 1,
-              style: BorderStyle.SINGLE,
+              style: BorderStyle.NONE,
               size: 6,
             },
           },
@@ -513,7 +544,7 @@ export const generateDocx = async (resumeData: ResumeData) => {
             bottom: {
               color: 'auto',
               space: 1,
-              style: BorderStyle.SINGLE,
+              style: BorderStyle.NONE,
               size: 6,
             },
           },
@@ -536,15 +567,112 @@ export const generateDocx = async (resumeData: ResumeData) => {
 
       resumeData.workExperiences.forEach((experience) => {
         // Company and Date using tab stops like the reference
-        const dateRange = `${experience.startMonth} ${experience.startYear} - ${
-          experience.isCurrentJob ? 'Present' : `${experience.endMonth} ${experience.endYear}`
+        const dateRange = `${getLocalizedMonth(experience.startMonth)} ${experience.startYear} - ${
+          experience.isCurrentJob ? 'Present' : `${getLocalizedMonth(experience.endMonth)} ${experience.endYear}`
         }`;
 
-        children.push(createInstitutionHeader(experience.companyName, dateRange));
+        // Work experience entry using table format for proper alignment
+        const workExperienceTable = new Table({
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: experience.jobTitle,
+                          bold: true,
+                          size: 22,
+                        }),
+                      ],
+                      spacing: {
+                        after: 30,
+                      },
+                    }),
+                  ],
+                  width: {
+                    size: 65,
+                    type: WidthType.PERCENTAGE,
+                  },
+                  borders: {
+                    top: { style: BorderStyle.NONE },
+                    bottom: { style: BorderStyle.NONE },
+                    left: { style: BorderStyle.NONE },
+                    right: { style: BorderStyle.NONE },
+                  },
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: dateRange,
+                          size: 20,
+                        }),
+                      ],
+                      alignment: AlignmentType.RIGHT,
+                      spacing: {
+                        after: 30,
+                      },
+                    }),
+                  ],
+                  width: {
+                    size: 35,
+                    type: WidthType.PERCENTAGE,
+                  },
+                  borders: {
+                    top: { style: BorderStyle.NONE },
+                    bottom: { style: BorderStyle.NONE },
+                    left: { style: BorderStyle.NONE },
+                    right: { style: BorderStyle.NONE },
+                  },
+                }),
+              ],
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: `${experience.companyName} • ${experience.location}`,
+                          bold: false,
+                          size: 20,
+                        }),
+                      ],
+                      spacing: {
+                        after: 150,
+                      },
+                    }),
+                  ],
+                  borders: {
+                    top: { style: BorderStyle.NONE },
+                    bottom: { style: BorderStyle.NONE },
+                    left: { style: BorderStyle.NONE },
+                    right: { style: BorderStyle.NONE },
+                  },
+                }),
+              ],
+            }),
+          ],
+          width: {
+            size: 100,
+            type: WidthType.PERCENTAGE,
+          },
+          borders: {
+            top: { style: BorderStyle.NONE },
+            bottom: { style: BorderStyle.NONE },
+            left: { style: BorderStyle.NONE },
+            right: { style: BorderStyle.NONE },
+            insideHorizontal: { style: BorderStyle.NONE },
+            insideVertical: { style: BorderStyle.NONE },
+          },
+        });
         
-        // Job Title as role text
-        children.push(createRoleText(`${experience.jobTitle} • ${experience.location}`));
-
+        children.push(workExperienceTable);
+        
         // Responsibilities using enhanced HTML parsing
         if (experience.responsibilities) {
           const responsibilityParagraphs = createParagraphsFromHtml(experience.responsibilities || '');
@@ -559,16 +687,151 @@ export const generateDocx = async (resumeData: ResumeData) => {
 
       resumeData.education.forEach((edu) => {
         // School and Date using tab stops
-        const dateRange = `${edu.startYear} - ${edu.endYear}`;
-        children.push(createInstitutionHeader(edu.schoolName, dateRange));
-        
-        // Degree as role text
-        children.push(createRoleText(`${edu.degree} in ${edu.major}`));
+        const dateRange = (() => {
+          if (edu.startMonth && edu.startYear) {
+            const start = `${getLocalizedMonth(edu.startMonth)}, ${edu.startYear}`;
+            if (edu.isCurrentlyEnrolled) {
+              return `${start} - Present`;
+            } else if (edu.endMonth && edu.endYear) {
+              return `${start} - ${getLocalizedMonth(edu.endMonth)}, ${edu.endYear}`;
+            } else {
+              // Fallback for legacy structure
+              return `${edu.startYear} - ${edu.endYear}`;
+            }
+          }
+          // Fallback for legacy structure
+          return `${edu.startYear} - ${edu.endYear}`;
+        })();
+        // Education entry using table format for proper alignment
+        const courseText = (() => {
+          // New simplified structure
+          if (edu.courseOrQualification) {
+            return edu.courseOrQualification;
+          }
+          
+          // Legacy support
+          if (edu.degreeType && edu.fieldOfStudy) {
+            let text = `${edu.degreeType} in ${edu.fieldOfStudy}`;
+            if (edu.honoursClassification && edu.honoursClassification !== 'None') {
+              text += ` with ${edu.honoursClassification}`;
+            }
+            return text;
+          }
+          
+          // Ultimate fallback
+          const degree = (edu as any).degree || edu.educationLevel;
+          const major = (edu as any).major || edu.fieldOfStudy;
+          return `${degree} in ${major}`;
+        })();
 
-        // Additional info using enhanced HTML parsing
-        if (edu.additionalInfo) {
-          const additionalInfoParagraphs = createParagraphsFromHtml(edu.additionalInfo || '');
-          children.push(...additionalInfoParagraphs);
+        // Create table for degree and date alignment
+        const educationTable = new Table({
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: courseText,
+                          bold: true,
+                          size: 22,
+                        }),
+                      ],
+                      spacing: {
+                        after: 30,
+                      },
+                    }),
+                  ],
+                  width: {
+                    size: 65,
+                    type: WidthType.PERCENTAGE,
+                  },
+                  borders: {
+                    top: { style: BorderStyle.NONE },
+                    bottom: { style: BorderStyle.NONE },
+                    left: { style: BorderStyle.NONE },
+                    right: { style: BorderStyle.NONE },
+                  },
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: dateRange,
+                          bold: false,
+                          size: 20,
+                        }),
+                      ],
+                      alignment: AlignmentType.RIGHT,
+                      spacing: {
+                        after: 30,
+                      },
+                    }),
+                  ],
+                  width: {
+                    size: 35,
+                    type: WidthType.PERCENTAGE,
+                  },
+                  borders: {
+                    top: { style: BorderStyle.NONE },
+                    bottom: { style: BorderStyle.NONE },
+                    left: { style: BorderStyle.NONE },
+                    right: { style: BorderStyle.NONE },
+                  },
+                }),
+              ],
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: edu.institution || edu.schoolName || '',
+                          bold: false,
+                          size: 20,
+                        }),
+                      ],
+                      spacing: {
+                        after: 150,
+                      },
+                    }),
+                  ],
+                  borders: {
+                    top: { style: BorderStyle.NONE },
+                    bottom: { style: BorderStyle.NONE },
+                    left: { style: BorderStyle.NONE },
+                    right: { style: BorderStyle.NONE },
+                  },
+                }),
+              ],
+            }),
+          ],
+          width: {
+            size: 100,
+            type: WidthType.PERCENTAGE,
+          },
+          borders: {
+            top: { style: BorderStyle.NONE },
+            bottom: { style: BorderStyle.NONE },
+            left: { style: BorderStyle.NONE },
+            right: { style: BorderStyle.NONE },
+            insideHorizontal: { style: BorderStyle.NONE },
+            insideVertical: { style: BorderStyle.NONE },
+          },
+        });
+        
+        children.push(educationTable);
+        
+        // Course highlights using enhanced HTML parsing
+        const highlights = edu.highlights || edu.description || (edu as any).additionalInfo;
+        if (highlights) {
+          const highlightsParagraphs = createParagraphsFromHtml(highlights || '');
+          children.push(...highlightsParagraphs);
         }
       });
     }
@@ -832,12 +1095,16 @@ export const generateDocx = async (resumeData: ResumeData) => {
 
       resumeData.optionalSections.certificates.forEach((cert) => {
         children.push(createInstitutionHeader(cert.name, cert.date));
-        children.push(createRoleText(cert.issuer));
+        children.push(createSubHeading(cert.issuer));
       });
     }
 
     if (resumeData.optionalSections.languages.length > 0) {
       children.push(createHeading('Languages'));
+
+      resumeData.optionalSections.languages.forEach((lang) => {
+        children.push(createLanguageHeader(lang.name, lang.proficiency));
+      });
 
       // Create languages as a single paragraph like skills in the reference
       const languageText = resumeData.optionalSections.languages
@@ -931,30 +1198,62 @@ export const generateDocx = async (resumeData: ResumeData) => {
        ],
      });
 
-     console.log('Converting to blob...');
-     // Generate and download the document using toBlob (browser-compatible)
-     const blob = await Packer.toBlob(doc);
-     
-     console.log('Blob created, size:', blob.size);
-     
-     const fileName = resumeData.personalInfo.fullName 
-       ? `${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_Resume.docx`
-       : 'My_Resume.docx';
-     
-     console.log('Downloading file:', fileName);
-     
-     saveAs(blob, fileName);
-     
-     console.log('DOCX generation completed successfully');
-     return true;
-   } catch (error) {
-     console.error('Error generating DOCX:', error);
-     console.error('Error details:', {
-       message: error instanceof Error ? error.message : 'Unknown error',
-       stack: error instanceof Error ? error.stack : undefined,
-       errorType: typeof error,
-       browser: navigator.userAgent
-     });
-     throw error;
-   }
+     return doc;
+}
+
+export const generateDocx = async (resumeData: ResumeData) => {
+  try {
+    const doc = createDocument(resumeData);
+
+    console.log('Converting to blob...');
+    // Generate and download the document using toBlob (browser-compatible)
+    const blob = await Packer.toBlob(doc);
+    
+    console.log('Blob created, size:', blob.size);
+    
+    const fileName = resumeData.personalInfo.fullName 
+      ? `${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_Resume.docx`
+      : 'My_Resume.docx';
+    
+    console.log('Downloading file:', fileName);
+    
+    saveAs(blob, fileName);
+    
+    console.log('DOCX generation completed successfully');
+    return true;
+  } catch (error) {
+    console.error('Error generating DOCX:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      errorType: typeof error,
+      browser: navigator.userAgent
+    });
+    throw error;
+  }
 };
+
+export const generateDocxBlob = async (resumeData: ResumeData): Promise<Blob> => {
+  try {
+    const doc = createDocument(resumeData);
+
+    console.log('Converting to blob...');
+    // Generate and download the document using toBlob (browser-compatible)
+    const blob = await Packer.toBlob(doc);
+    
+    console.log('Blob created, size:', blob.size);
+     
+    return blob;
+  } catch (error) {
+    console.error('Error generating DOCX:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      errorType: typeof error,
+      browser: navigator.userAgent
+    });
+    throw error;
+  }
+};
+
+

@@ -1,19 +1,22 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle } from 'lucide-react';
 
-const steps = [
-  { path: '/', label: 'Personal Info', step: 1 },
-  { path: '/summary', label: 'Summary', step: 2 },
-  { path: '/experience', label: 'Experience', step: 3 },
-  { path: '/education', label: 'Education', step: 4 },
-  { path: '/skills', label: 'Skills', step: 5 },
-  { path: '/optional', label: 'Optional', step: 6 },
-  { path: '/preview', label: 'Preview', step: 7 }
+const getSteps = (t: any) => [
+  { path: '/', labelKey: 'steps.personalInfo', step: 1 },
+  { path: '/summary', labelKey: 'steps.summary', step: 2 },
+  { path: '/experience', labelKey: 'steps.experience', step: 3 },
+  { path: '/education', labelKey: 'steps.education', step: 4 },
+  { path: '/skills', labelKey: 'steps.skills', step: 5 },
+  { path: '/optional', labelKey: 'steps.optional', step: 6 },
+  { path: '/preview', labelKey: 'steps.preview', step: 7 }
 ];
 
 const StepIndicator: React.FC = () => {
   const location = useLocation();
+  const { t } = useTranslation();
+  const steps = getSteps(t);
   const currentStepIndex = steps.findIndex(step => step.path === location.pathname);
 
   return (
@@ -41,7 +44,7 @@ const StepIndicator: React.FC = () => {
               <span className={`mt-2 text-xs font-medium ${
                 isCurrent ? 'text-blue-600' : 'text-gray-500'
               }`}>
-                {step.label}
+                {t(step.labelKey)}
               </span>
             </div>
             {index < steps.length - 2 && (
