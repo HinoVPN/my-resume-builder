@@ -5,7 +5,6 @@ import { ArrowLeft, Download, Edit, RefreshCw } from 'lucide-react';
 import { useAppSelector } from '../hooks/redux';
 import { generateDocx } from '../utils/docxGenerator';
 import { generateDocxTC } from '../utils/docxGeneratorTC';
-import { downloadPlainTextResume } from '../utils/docxGeneratorFallback';
 import { renderAsync } from 'docx-preview';
 
 const PreviewPage: React.FC = () => {
@@ -112,14 +111,6 @@ const PreviewPage: React.FC = () => {
     generatePreview();
   }, [resumeData, i18n.language]);
 
-  // Additional effect specifically for language changes to ensure proper regeneration
-  useEffect(() => {
-    if (previewGenerated) {
-      // Force regeneration when language changes
-      generatePreview(true);
-    }
-  }, [i18n.language]);
-
   const handleDownloadDocx = async () => {
     try {
       // Use Traditional Chinese version if language is zh-TW
@@ -131,12 +122,80 @@ const PreviewPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to generate DOCX:', error);
       alert(t('preview.downloadError'));
-      downloadPlainTextResume(resumeData as any);
     }
   };
 
+  //TODO: Add PDF download
+  // const handleDownloadPdf = async () => {
+  //   try {
+  //     // Show loading state
+  //     const loadingToast = document.createElement('div');
+  //     loadingToast.style.cssText = `
+  //       position: fixed;
+  //       top: 20px;
+  //       right: 20px;
+  //       background: #3b82f6;
+  //       color: white;
+  //       padding: 12px 20px;
+  //       border-radius: 8px;
+  //       z-index: 10000;
+  //       font-family: system-ui;
+  //       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  //     `;
+  //     loadingToast.textContent = i18n.language === 'zh-TW' ? '正在生成 PDF...' : 'Generating PDF...';
+  //     document.body.appendChild(loadingToast);
+
+  //     // Generate PDF using the same data structure as DOCX
+  //     const language = i18n.language as 'en' | 'zh-TW';
+  //     await generatePdf(resumeData as any, language);
+
+  //     // Remove loading toast
+  //     document.body.removeChild(loadingToast);
+
+  //     // Show success message
+  //     const successToast = document.createElement('div');
+  //     successToast.style.cssText = loadingToast.style.cssText.replace('#3b82f6', '#10b981');
+  //     successToast.textContent = i18n.language === 'zh-TW' ? 'PDF 已成功下載！' : 'PDF downloaded successfully!';
+  //     document.body.appendChild(successToast);
+  //     setTimeout(() => {
+  //       if (document.body.contains(successToast)) {
+  //         document.body.removeChild(successToast);
+  //       }
+  //     }, 3000);
+
+  //   } catch (error) {
+  //     console.error('Failed to generate PDF:', error);
+      
+  //     // Remove loading toast if it exists
+  //     const loadingToast = document.querySelector('div[style*="正在生成 PDF"], div[style*="Generating PDF"]');
+  //     if (loadingToast) {
+  //       document.body.removeChild(loadingToast);
+  //     }
+
+  //     alert(i18n.language === 'zh-TW' ? 'PDF 生成失敗，請稍後再試' : 'Failed to generate PDF. Please try again.');
+  //   }
+  // };
+
+  {isGeneratingPreview && (
+    <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
+      <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mr-3" />
+      <span className="text-lg text-gray-700">
+        {i18n.language === 'zh-TW' ? '正在生成預覽...' : 'Generating preview...'}
+      </span>
+    </div>
+    )}
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {isGeneratingPreview && (
+      <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
+        <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mr-3" />
+        <span className="text-lg text-gray-700">
+          {i18n.language === 'zh-TW' ? '正在生成預覽...' : 'Generating preview...'}
+        </span>
+      </div>
+      )}
+
       {/* Navigation Header */}
       <div className="sticky top-0 z-10 bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -161,24 +220,24 @@ const PreviewPage: React.FC = () => {
                 <Edit className="w-4 h-4 mr-2" />
                 {t('preview.editResume')}
               </button>
-              <button
-                onClick={() => generatePreview(false)}
-                disabled={isGeneratingPreview}
-                className="btn-secondary flex items-center"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${isGeneratingPreview ? 'animate-spin' : ''}`} />
-                {isGeneratingPreview 
-                  ? (i18n.language === 'zh-TW' ? '生成中...' : 'Generating...')
-                  : (i18n.language === 'zh-TW' ? '刷新預覽' : 'Refresh Preview')
-                }
-              </button>
+
               <button
                 onClick={handleDownloadDocx}
                 className="btn-primary flex items-center"
               >
                 <Download className="w-4 h-4 mr-2" />
-                {t('preview.downloadWord')}
+                {i18n.language === 'zh-TW' ? '下載 Word' : 'Download Word'}
               </button>
+
+              {/* 
+              //TODO: Add PDF download
+              <button
+                onClick={handleDownloadPdf}
+                className="btn-primary flex items-center bg-red-600 hover:bg-red-700"
+              >
+                <FileDown className="w-4 h-4 mr-2" />
+                {i18n.language === 'zh-TW' ? '下載 PDF' : 'Download PDF'}
+              </button> */}
             </div>
           </div>
         </div>
@@ -187,15 +246,6 @@ const PreviewPage: React.FC = () => {
       {/* DOCX Preview */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-          {isGeneratingPreview && (
-            <div className="flex items-center justify-center p-8 bg-gray-50">
-              <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mr-3" />
-              <span className="text-lg text-gray-700">
-                {i18n.language === 'zh-TW' ? '正在生成 DOCX 預覽...' : 'Generating DOCX preview...'}
-              </span>
-            </div>
-          )}
-          
           <div 
             ref={docxPreviewRef}
             className="docx-preview-container"
