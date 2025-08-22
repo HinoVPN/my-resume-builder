@@ -5,7 +5,8 @@ import type {
   WorkExperience, 
   Education, 
   Skill, 
-  OptionalSections 
+  OptionalSections,
+  SectionOrdering 
 } from '../types/resume';
 
 // Initial state
@@ -19,14 +20,17 @@ const initialState: ResumeData = {
     website: '',
     linkedin: ''
   },
-  professionalSummary: '',
+  professionalSummary: {
+    content: ''
+  },
   workExperiences: [],
   education: [],
   skills: [],
   optionalSections: {
     hobbies: '',
     certificates: [],
-    languages: []
+    languages: [],
+    customSections: []
   }
 };
 
@@ -42,7 +46,9 @@ const resumeSlice = createSlice({
 
     // Professional Summary Actions
     updateProfessionalSummary: (state, action: PayloadAction<string>) => {
-      state.professionalSummary = action.payload;
+      state.professionalSummary = {
+        content: action.payload
+      };
     },
 
     // Work Experience Actions
@@ -98,6 +104,11 @@ const resumeSlice = createSlice({
       state.optionalSections = action.payload;
     },
 
+    // Section Ordering Actions
+    updateSectionOrdering: (state, action: PayloadAction<SectionOrdering[]>) => {
+      state.sectionOrdering = action.payload;
+    },
+
     // Reset Action
     resetResume: () => {
       return initialState;
@@ -119,6 +130,7 @@ export const {
   updateSkill,
   removeSkill,
   updateOptionalSections,
+  updateSectionOrdering,
   resetResume
 } = resumeSlice.actions;
 

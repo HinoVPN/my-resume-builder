@@ -17,6 +17,7 @@
     "education": "Education",
     "skills": "Skills",
     "optional": "Optional",
+    "ordering": "Ordering",
     "preview": "Preview"
   },
   "personalInfo": {
@@ -161,15 +162,24 @@
     "addAnotherLanguage": "Add Another Language",
     "languageName": "Language",
     "remark": "Remark / Level",
+    "customSections": "Custom Sections",
+    "noCustomSections": "No custom sections added yet",
+    "customSectionNumber": "Section #{{number}}",
+    "addCustomSection": "Add Custom Section",
+    "addAnotherCustomSection": "Add Another Section",
+    "customSectionTitle": "Section Title",
+    "customSectionContent": "Section Content",
     "placeholders": {
       "hobbies": "e.g., Photography, Hiking, Playing Guitar, Reading, Volunteer Work",
       "certificateName": "e.g., AWS Certified Solutions Architect",
       "issuingOrganization": "e.g., Amazon Web Services",
       "dateObtained": "e.g., March 2024, 2024",
       "languageName": "e.g., Spanish, Mandarin, French",
-      "remark": "e.g., Native, Fluent, JLPT N1, Conversational"
+      "remark": "e.g., Native, Fluent, JLPT N1, Conversational",
+      "customSectionTitle": "e.g., Volunteer Experience, Publications, Awards",
+      "customSectionContent": "Describe your achievements, activities, or other relevant information..."
     },
-    "previewButton": "Preview Resume"
+    "nextButton": "Next: Section Ordering"
   },
   "preview": {
     "title": "Resume Preview",
@@ -234,5 +244,34 @@
     "switch": "Language",
     "english": "English",
     "chineseTraditional": "繁體中文"
+  },
+  "ordering": {
+    "title": "Section Ordering",
+    "subtitle": "Arrange your resume sections in the order you prefer. You can also enable or disable sections as needed.",
+    "enabledSections": "Enabled Sections",
+    "disabledSections": "Disabled Sections",
+    "noEnabledSections": "No sections are currently enabled",
+    "moveUp": "Move Up",
+    "moveDown": "Move Down",
+    "enable": "Enable",
+    "disable": "Disable",
+    "sections": {
+      "contactInfo": "Contact Information",
+      "professionalSummary": "Professional Summary",
+      "workExperience": "Work Experience",
+      "education": "Education",
+      "skills": "Skills",
+      "certificates": "Certificates",
+      "languages": "Languages",
+      "hobbies": "Hobbies & Interests"
+    },
+    "tips": {
+      "title": "Tips:",
+      "tip1": "Drag sections or use arrow buttons to reorder",
+      "tip2": "Enable/disable sections based on relevance",
+      "tip3": "Contact information always appears first",
+      "tip4": "Custom sections will appear with their titles"
+    },
+    "previewButton": "Preview Resume"
   }
 }

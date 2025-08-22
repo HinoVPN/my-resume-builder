@@ -11,6 +11,10 @@ export interface PersonalInfo {
   linkedin?: string;
 }
 
+export interface ProfessionalSummary {
+  content: string;
+}
+
 export interface WorkExperience {
   id: string;
   companyName: string;
@@ -55,19 +59,34 @@ export interface Language {
   remark: string;
 }
 
+export interface CustomSection {
+  id: string;
+  title: string;
+  content: string; // Rich text content like professional summary
+}
+
+export interface SectionOrdering {
+  id: string;
+  labelKey: string;
+  enabled: boolean;
+  order: number;
+}
+
 export interface OptionalSections {
   hobbies: string;
   certificates: Certificate[];
   languages: Language[];
+  customSections: CustomSection[];
 }
 
 export interface ResumeData {
   personalInfo: PersonalInfo;
-  professionalSummary: string;
+  professionalSummary: ProfessionalSummary;
   workExperiences: WorkExperience[];
   education: Education[];
   skills: Skill[];
   optionalSections: OptionalSections;
+  sectionOrdering?: SectionOrdering[];
 }
 
 export const MONTHS = [

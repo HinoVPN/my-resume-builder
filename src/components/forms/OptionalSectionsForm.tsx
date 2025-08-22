@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Plus, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { updateOptionalSections } from '../../store/resumeSlice';
-import { type Certificate, type Language } from '../../types/resume';
+import { type Certificate, type Language, type CustomSection } from '../../types/resume';
+import RichTextEditor from '../common/RichTextEditor';
 
 const OptionalSectionsForm: React.FC = () => {
   const optionalSections = useAppSelector(state => state.resume.optionalSections);
@@ -15,11 +16,13 @@ const OptionalSectionsForm: React.FC = () => {
   const [hobbies, setHobbies] = useState(optionalSections.hobbies);
   const [certificates, setCertificates] = useState<Certificate[]>(optionalSections.certificates);
   const [languages, setLanguages] = useState<Language[]>(optionalSections.languages);
+  const [customSections, setCustomSections] = useState<CustomSection[]>(optionalSections.customSections || []);
   
   const [expandedSections, setExpandedSections] = useState({
     hobbies: true,
     certificates: true,
-    languages: true
+    languages: true,
+    customSections: true
   });
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -76,11 +79,12 @@ const OptionalSectionsForm: React.FC = () => {
     const optionalSections = {
       hobbies,
       certificates: certificates.filter(cert => cert.name && cert.issuer),
-      languages: languages.filter(lang => lang.name)
+      languages: languages.filter(lang => lang.name),
+      customSections: customSections.filter(section => section.title && section.content)
     };
     
     dispatch(updateOptionalSections(optionalSections));
-    navigate('/preview');
+    navigate('/ordering');
   };
 
   const handleBack = () => {
@@ -88,6 +92,25 @@ const OptionalSectionsForm: React.FC = () => {
   };
 
   // Removed getProficiencyColor function - no longer needed with remark field
+
+  const addCustomSection = () => {
+    const newCustomSection: CustomSection = {
+      id: generateId(),
+      title: '',
+      content: ''
+    };
+    setCustomSections([...customSections, newCustomSection]);
+  };
+
+  const removeCustomSection = (id: string) => {
+    setCustomSections(customSections.filter(section => section.id !== id));
+  };
+
+  const updateCustomSection = (id: string, field: keyof CustomSection, value: string) => {
+    setCustomSections(customSections.map(section => 
+      section.id === id ? { ...section, [field]: value } : section
+    ));
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -332,6 +355,94 @@ const OptionalSectionsForm: React.FC = () => {
           )}
         </div>
 
+        {/* Custom Sections */}
+        <div className="border border-gray-200 rounded-lg mb-6">
+          <button
+            type="button"
+            onClick={() => toggleSection('customSections')}
+            className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50"
+          >
+            <h3 className="text-lg font-medium text-gray-900">
+              {t('optional.customSections')} ({customSections.length})
+            </h3>
+            {expandedSections.customSections ? (
+              <ChevronDown className="w-5 h-5 text-gray-400" />
+            ) : (
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+            )}
+          </button>
+          
+          {expandedSections.customSections && (
+            <div className="p-4 border-t border-gray-200">
+              {customSections.length === 0 ? (
+                <div className="text-center py-6">
+                  <p className="text-gray-500 mb-4">{t('optional.noCustomSections')}</p>
+                  <button
+                    type="button"
+                    onClick={addCustomSection}
+                    className="btn-primary flex items-center mx-auto"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {t('optional.addCustomSection')}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {customSections.map((section, index) => (
+                    <div key={section.id} className="bg-gray-50 p-4 rounded-lg mb-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="font-medium text-gray-900">{t('optional.customSectionNumber', { number: index + 1 })}</h4>
+                        <button
+                          type="button"
+                          onClick={() => removeCustomSection(section.id)}
+                          className="text-red-600 hover:text-red-800 p-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      
+                      <div className="form-group mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t('optional.customSectionTitle')}
+                        </label>
+                        <input
+                          type="text"
+                          value={section.title}
+                          onChange={(e) => updateCustomSection(section.id, 'title', e.target.value)}
+                          className="form-input"
+                          placeholder={t('optional.placeholders.customSectionTitle')}
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t('optional.customSectionContent')}
+                        </label>
+                        <RichTextEditor
+                          value={section.content}
+                          onChange={(content) => updateCustomSection(section.id, 'content', content)}
+                          placeholder={t('optional.placeholders.customSectionContent')}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={addCustomSection}
+                      className="btn-secondary flex items-center mx-auto"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      {t('optional.addAnotherCustomSection')}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
         <div className="flex justify-between mt-8">
           <button 
             type="button" 
@@ -345,7 +456,7 @@ const OptionalSectionsForm: React.FC = () => {
             type="submit" 
             className="btn-primary flex items-center"
           >
-            {t('optional.previewButton')}
+            {t('optional.nextButton')}
             <ArrowRight className="w-4 h-4 ml-2" />
           </button>
         </div>
