@@ -7,7 +7,6 @@ import {
   getDocumentConfig
 } from '../types/resume';
 import { COMMON_CONSTANTS } from '../types/commonConstants';
-import i18n from '../i18n';
 
 export const createDocument = (resumeData: ResumeData, language: string = 'en') => {
   console.log(`Starting ${language} DOCX generation...`, resumeData);
@@ -427,7 +426,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
   }
 
   // Create ordered children array based on user preferences
-  let orderedChildren: (Paragraph | Table)[] = [];
+  const orderedChildren: (Paragraph | Table)[] = [];
   
   if (resumeData.sectionOrdering && resumeData.sectionOrdering.length > 0) {
     // Use user-defined ordering

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
@@ -19,7 +19,7 @@ const OrderingForm: React.FC = () => {
   const { t } = useTranslation();
 
   // Get current section ordering or create default
-  const getDefaultSections = (): SectionInfo[] => {
+  const getDefaultSections = useCallback((): SectionInfo[] => {
     const sections: SectionInfo[] = [
       { id: 'contactInfo', labelKey: 'ordering.sections.contactInfo', enabled: true, order: 1 },
       { id: 'professionalSummary', labelKey: 'ordering.sections.professionalSummary', enabled: !!resumeData.professionalSummary.content, order: 2 },
@@ -38,12 +38,12 @@ const OrderingForm: React.FC = () => {
           id: `custom_${customSection.id}`,
           labelKey: customSection.title,
           enabled: true,
-          order: 8 + index
+          order: 9 + index
         });
       });
     }
     return sections;
-  };
+  }, [resumeData]);
 
   const [sections, setSections] = useState<SectionInfo[]>(() => {
     if (resumeData.sectionOrdering && resumeData.sectionOrdering.length > 0) {
@@ -57,10 +57,9 @@ const OrderingForm: React.FC = () => {
     if (!resumeData.sectionOrdering || resumeData.sectionOrdering.length === 0) {
       setSections(getDefaultSections());
     }
-  }, []);
+  }, [resumeData.sectionOrdering, getDefaultSections]);
 
   const moveSection = (sectionId: string, direction: 'up' | 'down') => {
-    console.log(sections);
     const enabledSectionsList = sections
       .filter(section => section.enabled)
       .sort((a, b) => a.order - b.order);
@@ -78,18 +77,21 @@ const OrderingForm: React.FC = () => {
       return; // Can't move further
     }
     
-    // Swap the order values of the two sections
-    const currentSection = enabledSectionsList[currentIndex];
-    const targetSection = enabledSectionsList[targetIndex];
+    // Create a new array with swapped elements
+    const newEnabledList = [...enabledSectionsList];
+    [newEnabledList[currentIndex], newEnabledList[targetIndex]] = 
+    [newEnabledList[targetIndex], newEnabledList[currentIndex]];
     
-    setSections(sections.map(section => {
-      if (section.id === currentSection.id) {
-        return { ...section, order: targetSection.order };
-      } else if (section.id === targetSection.id) {
-        return { ...section, order: currentSection.order };
+    // Update order values sequentially for enabled sections
+    const updatedSections = sections.map(section => {
+      if (section.enabled) {
+        const newIndex = newEnabledList.findIndex(s => s.id === section.id);
+        return { ...section, order: newIndex + 1 };
       }
       return section;
-    }));
+    });
+    
+    setSections(updatedSections);
   };
 
   const toggleSectionEnabled = (sectionId: string) => {
@@ -131,6 +133,16 @@ const OrderingForm: React.FC = () => {
 
   const enabledSections = sections.filter(section => section.enabled);
   const disabledSections = sections.filter(section => !section.enabled);
+
+  // Debug: Log sections state
+  useEffect(() => {
+    console.log('Current sections:', sections.map(s => ({ 
+      id: s.id, 
+      enabled: s.enabled, 
+      order: s.order,
+      labelKey: s.labelKey 
+    })));
+  }, [sections]);
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
