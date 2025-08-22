@@ -17,6 +17,7 @@
     "education": "教育背景",
     "skills": "技能",
     "optional": "其他資訊",
+    "ordering": "區段排序",
     "preview": "預覽"
   },
   "personalInfo": {
@@ -161,15 +162,24 @@
     "addAnotherLanguage": "新增另一種語言",
     "languageName": "語言",
     "remark": "備註 / 程度",
+    "customSections": "自定義區段",
+    "noCustomSections": "尚未新增自定義區段",
+    "customSectionNumber": "區段 #{{number}}",
+    "addCustomSection": "新增自定義區段",
+    "addAnotherCustomSection": "新增另一個區段",
+    "customSectionTitle": "區段標題",
+    "customSectionContent": "區段內容",
     "placeholders": {
       "hobbies": "例如：攝影、爬山、彈吉他、閱讀、志工工作",
       "certificateName": "例如：AWS 認證解決方案架構師",
       "issuingOrganization": "例如：Amazon Web Services",
       "dateObtained": "例如：2024年3月、2024",
       "languageName": "例如：西班牙文、中文、法文",
-      "remark": "例如：母語、流利、日語N1、對話程度"
+      "remark": "例如：母語、流利、日語N1、對話程度",
+      "customSectionTitle": "例如：志工經驗、發表著作、獲獎紀錄",
+      "customSectionContent": "描述您的成就、活動或其他相關資訊..."
     },
-    "previewButton": "預覽履歷"
+    "nextButton": "下一步：區段排序"
   },
   "preview": {
     "title": "履歷預覽",
@@ -234,5 +244,34 @@
     "switch": "語言",
     "english": "English",
     "chineseTraditional": "繁體中文"
+  },
+  "ordering": {
+    "title": "區段排序",
+    "subtitle": "調整您履歷區段的順序，也可以根據需要啟用或停用區段。",
+    "enabledSections": "已啟用區段",
+    "disabledSections": "已停用區段",
+    "noEnabledSections": "目前沒有啟用的區段",
+    "moveUp": "向上移動",
+    "moveDown": "向下移動",
+    "enable": "啟用",
+    "disable": "停用",
+    "sections": {
+      "contactInfo": "聯絡資訊",
+      "professionalSummary": "專業摘要",
+      "workExperience": "工作經歷",
+      "education": "教育背景",
+      "skills": "技能",
+      "certificates": "證書",
+      "languages": "語言能力",
+      "hobbies": "興趣愛好"
+    },
+    "tips": {
+      "title": "提示：",
+      "tip1": "拖曳區段或使用箭頭按鈕重新排序",
+      "tip2": "根據相關性啟用/停用區段",
+      "tip3": "聯絡資訊總是顯示在最前面",
+      "tip4": "自定義區段會顯示其標題"
+    },
+    "previewButton": "預覽履歷"
   }
 }

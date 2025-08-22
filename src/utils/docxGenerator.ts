@@ -7,6 +7,7 @@ import {
   getDocumentConfig
 } from '../types/resume';
 import { COMMON_CONSTANTS } from '../types/commonConstants';
+import i18n from '../i18n';
 
 export const createDocument = (resumeData: ResumeData, language: string = 'en') => {
   console.log(`Starting ${language} DOCX generation...`, resumeData);
@@ -24,10 +25,38 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
     return index !== -1 ? localizedMonths[index] : englishMonth;
   };
 
-  // Removed getLocalizedProficiency function - no longer needed with remark field
+  // Master Section Map
+  const masterSection: Map<string, (Paragraph | Table)[]> = new Map();
 
-  // Header Section - Name
-  children.push(
+  // Header Section - Contact Information
+  const contactInfo: (Paragraph | Table)[] = [];
+
+  // Professional Summary
+  const professionalSummaryInfo: (Paragraph | Table)[] = [];
+
+  // Work Experience
+  const workExperienceInfo: (Paragraph | Table)[] = [];
+
+  // Education
+  const educationInfo: (Paragraph | Table)[] = [];
+
+  // Skills
+  const skillInfo: (Paragraph | Table)[] = [];
+  
+  // Hobbies
+  const hobbiesInfo: (Paragraph | Table)[] = [];
+
+  // Certificates
+  const certificatesInfo: (Paragraph | Table)[] = [];
+
+  // Languages
+  const languagesInfo: (Paragraph | Table)[] = [];
+
+  // Custom Sections
+  const customSectionsInfo: Map<string, (Paragraph | Table)[]> = new Map();
+  
+  // Name
+  contactInfo.push(
     new Paragraph({
       children: [
         new TextRun({
@@ -42,10 +71,10 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
       },
     })
   );
-
+  
   // Job Title
   if (resumeData.personalInfo.jobTitle) {
-    children.push(
+    contactInfo.push(
       new Paragraph({
         children: [
           new TextRun({
@@ -61,10 +90,9 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
       })
     );
   }
-
+  
   // Contact Information
   const contactLines: string[][] = [[], [], [], []];
-  
   // Distribute contact info across lines
   if (resumeData.personalInfo.email) contactLines[0].push(`${config.labels.email}${resumeData.personalInfo.email}`);
   if (resumeData.personalInfo.phone) contactLines[0].push(`${config.labels.phone}${resumeData.personalInfo.phone}`);
@@ -75,7 +103,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
   // Add contact lines
   contactLines.forEach(line => {
     if (line.length > 0) {
-      children.push(
+      contactInfo.push(
         new Paragraph({
           children: [
             new TextRun({
@@ -99,17 +127,22 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
       );
     }
   });
+  
+  // Push all contact information to children
+  children.push(...contactInfo);
+
+
 
   // Professional Summary
-  if (resumeData.professionalSummary) {
-    children.push(createHeading(config.labels.professionalSummary));
-    const summaryParagraphs = createParagraphsFromHtml(resumeData.professionalSummary || '');
-    children.push(...summaryParagraphs);
+  if (resumeData.professionalSummary.content) {
+    professionalSummaryInfo.push(createHeading(config.labels.professionalSummary));
+    const summaryParagraphs = createParagraphsFromHtml(resumeData.professionalSummary.content || '');
+    professionalSummaryInfo.push(...summaryParagraphs);
   }
 
   // Work Experience
   if (resumeData.workExperiences.length > 0) {
-    children.push(createHeading(config.labels.workExperience));
+    workExperienceInfo.push(createHeading(config.labels.workExperience));
 
     resumeData.workExperiences.forEach((experience) => {
       // Format date range based on language
@@ -122,7 +155,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
           }`;
 
       // Work Experience Table
-      children.push(createWorkExperienceTable(
+      workExperienceInfo.push(createWorkExperienceTable(
         experience.jobTitle,
         dateRange,
         experience.companyName,
@@ -132,10 +165,10 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
       // Responsibilities
       if (experience.responsibilities) {
         const responsibilityParagraphs = createParagraphsFromHtml(experience.responsibilities || '');
-        children.push(...responsibilityParagraphs);
+        workExperienceInfo.push(...responsibilityParagraphs);
       }
 
-      children.push(
+      workExperienceInfo.push(
         new Paragraph({
           children: [new TextRun({ text: ' ' })],
         })
@@ -145,7 +178,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
 
   // Education
   if (resumeData.education.length > 0) {
-    children.push(createHeading(config.labels.education));
+    educationInfo.push(createHeading(config.labels.education));
 
     resumeData.education.forEach((edu) => {
       // Format date range based on language
@@ -271,13 +304,13 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
         },
       });
       
-      children.push(educationTable);
+      educationInfo.push(educationTable);
       
       // Course highlights
       const highlights = edu.highlights || '';
       if (highlights) {
         const highlightsParagraphs = createParagraphsFromHtml(highlights || '');
-        children.push(...highlightsParagraphs);
+        educationInfo.push(...highlightsParagraphs);
       }
     });
   }
@@ -286,7 +319,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
 
   // Skills
   if (resumeData.skills.length > 0) {
-    children.push(createHeading(config.labels.skills));
+    skillInfo.push(createHeading(config.labels.skills));
 
     resumeData.skills.forEach((skill) => {
       // Skill table
@@ -303,23 +336,23 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
         WidthType.PERCENTAGE
       );
   
-      children.push(skillTable);
+      skillInfo.push(skillTable);
     });
 
   }
 
   // Optional Sections
   if (resumeData.optionalSections.certificates.length > 0) {
-    children.push(createHeading(config.labels.certificates));
+    certificatesInfo.push(createHeading(config.labels.certificates));
 
     resumeData.optionalSections.certificates.forEach((cert) => {
-      children.push(createInstitutionHeader(cert.name, cert.date));
-      children.push(createSubHeading(cert.issuer));
+      certificatesInfo.push(createInstitutionHeader(cert.name, cert.date));
+      certificatesInfo.push(createSubHeading(cert.issuer));
     });
   }
 
   if (resumeData.optionalSections.languages.length > 0) {
-    children.push(createHeading(config.labels.languages));
+    languagesInfo.push(createHeading(config.labels.languages));
 
     const languageText = resumeData.optionalSections.languages
       .map(lang => lang.remark 
@@ -330,7 +363,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
       )
       .join(language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? '、' : ', ') + (language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? '' : '.');
     
-    children.push(
+    languagesInfo.push(
       new Paragraph({
         children: [
           new TextRun({
@@ -346,9 +379,9 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
   }
 
   if (resumeData.optionalSections.hobbies) {
-    children.push(createHeading(config.labels.hobbiesInterests));
+    hobbiesInfo.push(createHeading(config.labels.hobbiesInterests));
 
-    children.push(
+    hobbiesInfo.push(
       new Paragraph({
         children: [
           new TextRun({
@@ -363,7 +396,123 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
     );
   }
 
-  console.log(`Creating ${language} document with`, children.length, 'elements...');
+  // Custom Sections
+  if (resumeData.optionalSections.customSections && resumeData.optionalSections.customSections.length > 0) {
+    resumeData.optionalSections.customSections.forEach((section) => {
+
+      // Custom Section
+      const customSectionInfo: (Paragraph | Table)[] = [];
+
+      customSectionInfo.push(createHeading(section.title));
+      const contentParagraphs = createParagraphsFromHtml(section.content || '');
+      customSectionInfo.push(...contentParagraphs);
+
+      if(customSectionInfo.length > 0) {
+        customSectionsInfo.set(section.title, customSectionInfo);
+      }
+
+    });
+  }
+
+  // Push all sections to master section
+  masterSection.set('contactInfo', contactInfo);
+  masterSection.set('workExperienceInfo', workExperienceInfo);
+  masterSection.set('educationInfo', educationInfo);
+  masterSection.set('skillInfo', skillInfo);
+  masterSection.set('certificatesInfo', certificatesInfo);
+  masterSection.set('languagesInfo', languagesInfo);
+  masterSection.set('hobbiesInfo', hobbiesInfo);
+  for(const [key, value] of customSectionsInfo) {
+    masterSection.set(key, value);
+  }
+
+  // Create ordered children array based on user preferences
+  let orderedChildren: (Paragraph | Table)[] = [];
+  
+  if (resumeData.sectionOrdering && resumeData.sectionOrdering.length > 0) {
+    // Use user-defined ordering
+    const enabledSections = resumeData.sectionOrdering
+      .filter(section => section.enabled)
+      .sort((a, b) => a.order - b.order);
+
+    console.log(enabledSections);
+    enabledSections.forEach(sectionInfo => {
+      console.log(sectionInfo);
+      let sectionKey = '';
+      
+      // Map section IDs to masterSection keys
+      switch (sectionInfo.id) {
+        case 'contactInfo':
+          sectionKey = 'contactInfo';
+          break;
+        case 'professionalSummary':
+          sectionKey = 'professionalSummaryInfo';
+          break;
+        case 'workExperience':
+          sectionKey = 'workExperienceInfo';
+          break;
+        case 'education':
+          sectionKey = 'educationInfo';
+          break;
+        case 'skills':
+          sectionKey = 'skillInfo';
+          break;
+        case 'certificates':
+          sectionKey = 'certificatesInfo';
+          break;
+        case 'languages':
+          sectionKey = 'languagesInfo';
+          break;
+        case 'hobbies':
+          sectionKey = 'hobbiesInfo';
+          break;
+        default:
+          // Handle custom sections
+          if (sectionInfo.id.startsWith('custom_')) {
+            sectionKey = sectionInfo.labelKey; // Custom section title
+          }
+          break;
+      }
+
+      if (sectionKey && masterSection.has(sectionKey)) {
+        const sectionContent = masterSection.get(sectionKey);
+        if (sectionContent && sectionContent.length > 0) {
+          orderedChildren.push(...sectionContent);
+        }
+      }
+
+    });
+  } else {
+    // Use default ordering (fallback)
+    const defaultOrder = [
+      'contactInfo',
+      'professionalSummaryInfo',
+      'workExperienceInfo', 
+      'educationInfo',
+      'skillInfo',
+      'certificatesInfo',
+      'languagesInfo',
+      'hobbiesInfo'
+    ];
+
+    defaultOrder.forEach(key => {
+      if (masterSection.has(key)) {
+        const sectionContent = masterSection.get(key);
+        if (sectionContent && sectionContent.length > 0) {
+          orderedChildren.push(...sectionContent);
+        }
+      }
+    });
+
+    // Add any custom sections at the end
+    for (const [, value] of customSectionsInfo) {
+      if (value && value.length > 0) {
+        orderedChildren.push(...value);
+      }
+    }
+  }
+
+  console.log(`Creating ${language} document with`, orderedChildren.length, 'elements...');
 
   // Create the document
   const doc = new Document({
@@ -412,7 +561,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
     sections: [
       {
         properties: {},
-        children: children,
+        children: orderedChildren,
       },
     ],
   });

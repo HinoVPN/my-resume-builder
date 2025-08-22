@@ -10,7 +10,8 @@ const getSteps = () => [
   { path: '/education', labelKey: 'steps.education', step: 4 },
   { path: '/skills', labelKey: 'steps.skills', step: 5 },
   { path: '/optional', labelKey: 'steps.optional', step: 6 },
-  { path: '/preview', labelKey: 'steps.preview', step: 7 }
+  { path: '/ordering', labelKey: 'steps.ordering', step: 7 },
+  { path: '/preview', labelKey: 'steps.preview', step: 8 }
 ];
 
 const StepIndicator: React.FC = () => {

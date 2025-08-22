@@ -7,6 +7,7 @@ import WorkExperienceForm from './components/forms/WorkExperienceForm'
 import EducationForm from './components/forms/EducationForm'
 import SkillsForm from './components/forms/SkillsForm'
 import OptionalSectionsForm from './components/forms/OptionalSectionsForm'
+import OrderingForm from './components/forms/OrderingForm'
 import PreviewPage from './components/PreviewPage'
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/education" element={<EducationForm />} />
         <Route path="/skills" element={<SkillsForm />} />
         <Route path="/optional" element={<OptionalSectionsForm />} />
+        <Route path="/ordering" element={<OrderingForm />} />
         <Route path="/preview" element={<PreviewPage />} />
       </Routes>
     </Layout>

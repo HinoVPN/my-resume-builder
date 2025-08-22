@@ -11,10 +11,10 @@ const ProfessionalSummaryForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [summary, setSummary] = useState(professionalSummary);
+  const [summary, setSummary] = useState(professionalSummary.content);
 
   useEffect(() => {
-    setSummary(professionalSummary);
+    setSummary(professionalSummary.content);
   }, [professionalSummary]);
 
   const handleSubmit = (e: React.FormEvent) => {
