@@ -55,7 +55,7 @@
     "experienceNumber": "Experience #{{number}}",
     "company": "Company Name",
     "position": "Job Title",
-    "city": "Location",
+    "city": "Location (Optional)",
     "employmentPeriod": "Employment Period",
     "startMonth": "Start Month",
     "startYear": "Start Year",
@@ -136,7 +136,10 @@
       "expert": "Industry recognized expertise"
     },
     "placeholder": "Type a skill (e.g., Python, Photoshop, Fluent English) and press Enter or comma",
-    "nextButton": "Next: Optional Sections"
+    "nextButton": "Next: Optional Sections",
+    "skillName": "Skill Name",
+    "removeSkill": "Remove Skill",
+    "yearsOptionalHint": "Years of experience is optional, leave blank to not display years"
   },
   "optional": {
     "title": "Optional Sections",
@@ -228,7 +231,9 @@
     "back": "Back",
     "tip": "Tip",
     "select": "Select",
-    "text": "Text"
+    "text": "Text",
+    "actions": "Actions",
+    "years": "years"
   },
   "language": {
     "switch": "Language",

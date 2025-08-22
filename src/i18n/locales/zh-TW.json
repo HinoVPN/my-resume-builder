@@ -55,7 +55,7 @@
     "experienceNumber": "經歷 #{{number}}",
     "company": "公司名稱",
     "position": "職位名稱",
-    "city": "所在地點",
+    "city": "所在地點（選填）",
     "employmentPeriod": "任職期間",
     "startMonth": "開始月份",
     "startYear": "開始年份",
@@ -136,7 +136,10 @@
       "expert": "業界認可的專業知識"
     },
     "placeholder": "輸入技能（例如：Python、Photoshop、流利英文）並按 Enter 或逗號",
-    "nextButton": "下一步：其他資訊"
+    "nextButton": "下一步：其他資訊",
+    "skillName": "技能名稱",
+    "removeSkill": "移除技能",
+    "yearsOptionalHint": "經驗年數是選填的，留空表示不顯示年數"
   },
   "optional": {
     "title": "其他資訊",
@@ -228,7 +231,9 @@
     "back": "返回",
     "tip": "提示",
     "select": "選擇",
-    "text": "文字檔"
+    "text": "文字檔",
+    "actions": "操作",
+    "years": "年"
   },
   "language": {
     "switch": "語言",

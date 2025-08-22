@@ -1,4 +1,4 @@
-import { Paragraph, TextRun, HeadingLevel, AlignmentType, TabStopPosition, TabStopType } from 'docx';
+import { Paragraph, TextRun, HeadingLevel, AlignmentType, TabStopPosition, TabStopType, Table, TableRow, TableCell, WidthType, BorderStyle } from 'docx';
 
 
 // Enhanced HTML parser for complex TinyMCE content
@@ -229,6 +229,31 @@ export const createInstitutionHeader = (institutionName: string, dateText: strin
     });
 };
 
+// Helper function to create institution header with tab stops like the reference
+export const createSkillText = (skillName: string, skillText: string): Paragraph => {
+    return new Paragraph({
+        tabStops: [
+            {
+                type: TabStopType.RIGHT,
+                position: TabStopPosition.MAX
+            }
+        ],
+        children: [
+        new TextRun({
+            text: skillName,
+            size: 20,
+        }),
+        new TextRun({
+            text: `\t${skillText}`,
+            size: 20,
+        })
+        ],
+        spacing: {
+            after: 30,
+        },
+    });
+};
+
 export const createLanguageHeader = (languageName: string, proficiency: string): Paragraph => {
     return new Paragraph({
         tabStops: [
@@ -341,9 +366,6 @@ export const createParagraphsFromHtml = (html: string): Paragraph[] => {
             new Paragraph({
             children: textRuns,
             alignment: alignment,
-            spacing: {
-                after: 100,
-            },
             })
         );
         } else if (item.type === 'bullet' || item.type === 'numbered') {
@@ -390,3 +412,190 @@ export const createParagraphsFromHtml = (html: string): Paragraph[] => {
 
     return paragraphs;
 };
+
+export const createWorkExperienceTable = (
+    jobTitle: string,
+    dateRange: string,
+    companyName: string,
+    location: string,
+): Table => {
+    return new Table({
+        rows: [
+            new TableRow({
+                children: [
+                new TableCell({
+                    children: [
+                    new Paragraph({
+                        children: [
+                        new TextRun({
+                            text: jobTitle,
+                            bold: true,
+                            size: 22,
+                        }),
+                        ],
+                        spacing: {
+                        after: 30,
+                        },
+                    }),
+                    ],
+                    width: {
+                    size: 65,
+                    type: WidthType.PERCENTAGE,
+                    },
+                    borders: {
+                    top: { style: BorderStyle.NONE },
+                    bottom: { style: BorderStyle.NONE },
+                    left: { style: BorderStyle.NONE },
+                    right: { style: BorderStyle.NONE },
+                    },
+                }),
+                new TableCell({
+                    children: [
+                    new Paragraph({
+                        children: [
+                        new TextRun({
+                            text: dateRange,
+                            size: 20,
+                        }),
+                        ],
+                        alignment: AlignmentType.RIGHT,
+                        spacing: {
+                        after: 30,
+                        },
+                    }),
+                    ],
+                    width: {
+                    size: 35,
+                    type: WidthType.PERCENTAGE,
+                    },
+                    borders: {
+                    top: { style: BorderStyle.NONE },
+                    bottom: { style: BorderStyle.NONE },
+                    left: { style: BorderStyle.NONE },
+                    right: { style: BorderStyle.NONE },
+                    },
+                }),
+                ],
+            }),
+            new TableRow({
+                children: [
+                new TableCell({
+                    children: [
+                    new Paragraph({
+                        children: [
+                        new TextRun({
+                            text: `${companyName}${location ? ` | ${location}` : ''}`,
+                            bold: false,
+                            size: 20,
+                        }),
+                        ],
+                        spacing: {
+                        after: 150,
+                        },
+                    }),
+                    ],
+                    borders: {
+                    top: { style: BorderStyle.NONE },
+                    bottom: { style: BorderStyle.NONE },
+                    left: { style: BorderStyle.NONE },
+                    right: { style: BorderStyle.NONE },
+                    },
+                }),
+                ],
+            }),
+        ],
+        width: {
+            size: 100,
+            type: WidthType.PERCENTAGE,
+        },
+        borders: {
+            top: { style: BorderStyle.NONE },
+            bottom: { style: BorderStyle.NONE },
+            left: { style: BorderStyle.NONE },
+            right: { style: BorderStyle.NONE },
+            insideHorizontal: { style: BorderStyle.NONE },
+            insideVertical: { style: BorderStyle.NONE },
+        },
+    });
+}
+
+export const createTwoColumnTable = (
+    leftColumn: string, 
+    leftColumnFontSize: number,
+    rightColumn: string,
+    rightColumnFontSize: number,
+    leftColumnWidth: number,
+    leftColumnWidthType: (typeof WidthType)[keyof typeof WidthType],
+    rightColumnWidth: number,
+    rightColumnWidthType: (typeof WidthType)[keyof typeof WidthType],
+    tableWidth: number,
+    tableWidthType: (typeof WidthType)[keyof typeof WidthType],
+): Table => {
+    return new Table({
+        rows: [
+            new TableRow({
+                children: [
+                    new TableCell({
+                        children: [
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: leftColumn,
+                                        size: leftColumnFontSize,
+                                        bold: true,
+                                    }),
+                                ],
+                                alignment: AlignmentType.LEFT,
+                            }),
+                        ],
+                        width: {
+                            size: leftColumnWidth,
+                            type: leftColumnWidthType,
+                        },
+                        borders: {
+                            top: { style: BorderStyle.NONE },
+                            bottom: { style: BorderStyle.NONE },
+                            left: { style: BorderStyle.NONE },
+                            right: { style: BorderStyle.NONE },
+                        },
+                    }),
+                    new TableCell({
+                        children: [
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: rightColumn,
+                                        size: rightColumnFontSize,
+                                    }),
+                                ],
+                                alignment: AlignmentType.RIGHT,
+                            }),
+                        ],
+                        width: {
+                            size: rightColumnWidth,
+                            type: rightColumnWidthType,
+                        },
+                        borders: {
+                            top: { style: BorderStyle.NONE },
+                            bottom: { style: BorderStyle.NONE },
+                            left: { style: BorderStyle.NONE },
+                            right: { style: BorderStyle.NONE },
+                        },
+                    }),
+                ],
+            }),
+        ],
+        width: {
+            size: tableWidth,
+            type: tableWidthType,
+        },
+        borders: {
+            top: { style: BorderStyle.NONE },
+            bottom: { style: BorderStyle.NONE },
+            left: { style: BorderStyle.NONE },
+            right: { style: BorderStyle.NONE },
+            insideHorizontal: { style: BorderStyle.NONE },
+            insideVertical: { style: BorderStyle.NONE },
+        },
+    });
+}
