@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Globe } from 'lucide-react';
+import { COMMON_CONSTANTS } from '../../types/commonConstants';
 
 const LanguageSwitcher: React.FC = () => {
   const { i18n, t } = useTranslation();
@@ -18,11 +19,11 @@ const LanguageSwitcher: React.FC = () => {
         </span>
       </button>
       
-      <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+      <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-20">
         <button
           onClick={() => handleLanguageChange('en')}
           className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-            i18n.language === 'en' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+            i18n.language === COMMON_CONSTANTS.LANGUAGE['EN'] ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
           }`}
         >
           {t('language.english')}
@@ -30,7 +31,7 @@ const LanguageSwitcher: React.FC = () => {
         <button
           onClick={() => handleLanguageChange('zh-TW')}
           className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-            i18n.language === 'zh-TW' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+            i18n.language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
           }`}
         >
           {t('language.chineseTraditional')}

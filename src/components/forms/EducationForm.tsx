@@ -118,7 +118,7 @@ const EducationForm: React.FC = () => {
               <button
                 type="button"
                 onClick={() => removeEducationItem(education.id)}
-                className="text-red-600 hover:text-red-800 p-2"
+                className="btn-danger flex items-center text-sm"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -279,7 +279,7 @@ const EducationForm: React.FC = () => {
           <button
             type="button"
             onClick={addNewEducation}
-            className="btn-secondary flex items-center mb-6"
+            className="btn-secondary flex items-center mx-auto"
           >
             <Plus className="w-4 h-4 mr-2" />
             {t('education.addButton')}

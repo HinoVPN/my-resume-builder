@@ -1,5 +1,10 @@
 import { jsPDF } from 'jspdf';
 import type { ResumeData } from '../types/resume';
+import { 
+  getLocalizedMonths, 
+  getLocalizedSkillLevels, 
+  getLocalizedLanguageProficiency 
+} from '../types/resume';
 
 // PDF dimensions in mm (A4)
 const PAGE_WIDTH = 210;
@@ -129,17 +134,30 @@ export const generatePdf = async (resumeData: ResumeData, language: 'en' | 'zh-T
 
   let yPosition = MARGIN + 10;
 
-  // Helper function to get localized month (for Chinese version)
+  // Localization helpers (使用與 DOCX 生成器相同的邏輯)
+  const localizedMonths = getLocalizedMonths(language);
+  const localizedSkillLevels = getLocalizedSkillLevels(language);
+  const localizedLanguageProficiency = getLocalizedLanguageProficiency(language);
+
   const getLocalizedMonth = (englishMonth: string): string => {
-    if (language === 'zh-TW') {
-      const monthMap: { [key: string]: string } = {
-        'January': '1月', 'February': '2月', 'March': '3月', 'April': '4月',
-        'May': '5月', 'June': '6月', 'July': '7月', 'August': '8月',
-        'September': '9月', 'October': '10月', 'November': '11月', 'December': '12月'
-      };
-      return monthMap[englishMonth] || englishMonth;
-    }
-    return englishMonth;
+    if (language === 'en') return englishMonth;
+    const englishMonths = getLocalizedMonths('en');
+    const index = englishMonths.indexOf(englishMonth);
+    return index !== -1 ? localizedMonths[index] : englishMonth;
+  };
+
+  const getLocalizedSkillLevel = (englishLevel: string): string => {
+    if (language === 'en') return englishLevel;
+    const englishLevels = getLocalizedSkillLevels('en') as readonly string[];
+    const index = englishLevels.indexOf(englishLevel);
+    return index !== -1 ? localizedSkillLevels[index] : englishLevel;
+  };
+
+  const getLocalizedProficiency = (englishProficiency: string): string => {
+    if (language === 'en') return englishProficiency;
+    const englishProficiencies = getLocalizedLanguageProficiency('en') as readonly string[];
+    const index = englishProficiencies.indexOf(englishProficiency);
+    return index !== -1 ? localizedLanguageProficiency[index] : englishProficiency;
   };
 
   // Header Section - Name
@@ -210,11 +228,13 @@ export const generatePdf = async (resumeData: ResumeData, language: 'en' | 'zh-T
       pdf.setFontSize(FONT_SIZES.subheading);
       pdf.setFont('helvetica', 'bold');
       
-      const dateRange = `${getLocalizedMonth(experience.startMonth)} ${experience.startYear} - ${
-        experience.isCurrentJob 
-          ? (language === 'zh-TW' ? '至今' : 'Present') 
-          : `${getLocalizedMonth(experience.endMonth)} ${experience.endYear}`
-      }`;
+      const dateRange = language === 'zh-TW' 
+        ? `${experience.startYear}年 ${getLocalizedMonth(experience.startMonth)} - ${
+            experience.isCurrentJob ? '目前' : `${experience.endYear}年 ${getLocalizedMonth(experience.endMonth)}`
+          }`
+        : `${getLocalizedMonth(experience.startMonth)} ${experience.startYear} - ${
+            experience.isCurrentJob ? 'Present' : `${getLocalizedMonth(experience.endMonth)} ${experience.endYear}`
+          }`;
       
       pdf.text(experience.jobTitle, MARGIN, yPosition);
       const dateWidth = pdf.getTextWidth(dateRange);
@@ -261,23 +281,28 @@ export const generatePdf = async (resumeData: ResumeData, language: 'en' | 'zh-T
       pdf.setFontSize(FONT_SIZES.subheading);
       pdf.setFont('helvetica', 'bold');
       
-      const courseText = edu.courseOrQualification || 
-        (edu.degreeType && edu.fieldOfStudy ? `${edu.degreeType} in ${edu.fieldOfStudy}` : '') ||
-        `${(edu as any).degree || edu.educationLevel} in ${(edu as any).major || edu.fieldOfStudy}`;
-      
       const dateRange = (() => {
         if (edu.startMonth && edu.startYear) {
-          const start = `${getLocalizedMonth(edu.startMonth)}, ${edu.startYear}`;
-          if (edu.isCurrentlyEnrolled) {
-            return `${start} - ${language === 'zh-TW' ? '至今' : 'Present'}`;
-          } else if (edu.endMonth && edu.endYear) {
-            return `${start} - ${getLocalizedMonth(edu.endMonth)}, ${edu.endYear}`;
+          if (language === 'zh-TW') {
+            const start = `${edu.startYear}年 ${getLocalizedMonth(edu.startMonth)}`;
+            if (edu.isCurrentStudy) {
+              return `${start} - 目前`;
+            } else if (edu.endMonth && edu.endYear) {
+              return `${start} - ${edu.endYear}年 ${getLocalizedMonth(edu.endMonth)}`;
+            }
+          } else {
+            const start = `${getLocalizedMonth(edu.startMonth)}, ${edu.startYear}`;
+            if (edu.isCurrentStudy) {
+              return `${start} - Present`;
+            } else if (edu.endMonth && edu.endYear) {
+              return `${start} - ${getLocalizedMonth(edu.endMonth)}, ${edu.endYear}`;
+            }
           }
         }
         return `${edu.startYear} - ${edu.endYear}`;
       })();
       
-      pdf.text(courseText, MARGIN, yPosition);
+      pdf.text(edu.courseOrQualification, MARGIN, yPosition);
       const eduDateWidth = pdf.getTextWidth(dateRange);
       pdf.text(dateRange, PAGE_WIDTH - MARGIN - eduDateWidth, yPosition);
       yPosition += 5;
@@ -285,11 +310,11 @@ export const generatePdf = async (resumeData: ResumeData, language: 'en' | 'zh-T
       // Institution
       pdf.setFontSize(FONT_SIZES.body);
       pdf.setFont('helvetica', 'normal');
-      pdf.text(edu.institution || edu.schoolName || '', MARGIN, yPosition);
+      pdf.text(edu.institution || '', MARGIN, yPosition);
       yPosition += 6;
       
       // Highlights
-      const highlights = edu.highlights || edu.description || (edu as any).additionalInfo;
+      const highlights = edu.highlights || '';
       if (highlights) {
         const bullets = parseHtmlToBullets(highlights);
         for (const bullet of bullets) {
@@ -329,8 +354,11 @@ export const generatePdf = async (resumeData: ResumeData, language: 'en' | 'zh-T
       for (let j = 0; j < skillsPerRow && i + j < resumeData.skills.length; j++) {
         const skill = resumeData.skills[i + j];
         const x = MARGIN + j * colWidth;
-        const skillText = `${skill.name} (${skill.years ? skill.years + ' years' : ''} - ${skill.level})`;
-        pdf.text(skillText, x, yPosition);
+              const yearsText = skill.years ? 
+        (language === 'zh-TW' ? `${skill.years}年` : `${skill.years} years`) : 
+        (language === 'zh-TW' ? '' : '');
+      const skillText = `${skill.name} (${yearsText} - ${getLocalizedSkillLevel(skill.level)})`;
+      pdf.text(skillText, x, yPosition);
       }
       yPosition += 6;
     }
@@ -367,8 +395,11 @@ export const generatePdf = async (resumeData: ResumeData, language: 'en' | 'zh-T
     pdf.setFont('helvetica', 'normal');
 
     const languageText = resumeData.optionalSections.languages
-      .map(lang => `${lang.name} (${lang.proficiency})`)
-      .join(', ');
+      .map(lang => language === 'zh-TW' 
+        ? `${lang.name}（${getLocalizedProficiency(lang.proficiency)}）`
+        : `${lang.name} (${getLocalizedProficiency(lang.proficiency)})`
+      )
+      .join(language === 'zh-TW' ? '、' : ', ');
     
     const languageLines = splitTextToFit(pdf, languageText, CONTENT_WIDTH, FONT_SIZES.body);
     for (const line of languageLines) {

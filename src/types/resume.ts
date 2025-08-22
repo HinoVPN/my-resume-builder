@@ -24,27 +24,14 @@ export interface WorkExperience {
 
 export interface Education {
   id: string;
-  courseOrQualification: string; // 課程或資格
-  institution: string;           // 機構/學校
-  startYear: string;            // 開始年份
-  startMonth: string;           // 開始月份
-  endYear: string;              // 結束年份
-  endMonth: string;             // 結束月份
-  isCurrentStudy: boolean;      // 目前在讀狀態 (類似 isCurrentJob)
-  highlights?: string;          // 課程亮點 (可選)
-  
-  // Legacy fields for backward compatibility (will be migrated)
-  educationLevel?: string;
-  schoolName?: string;
-  fieldOfStudy?: string;
-  degreeType?: string;
-  honoursClassification?: string;
-  schoolType?: string;
-  gpa?: string;
-  isCurrentlyEnrolled?: boolean; // Legacy field
-  hasGraduated?: boolean;
-  hasFinished?: boolean;
-  description?: string;
+  courseOrQualification: string; // Course or Qualification
+  institution: string;           // Institution   
+  startYear: string;            // Start Year
+  startMonth: string;           // Start Month
+  endYear: string;              // End Year
+  endMonth: string;             // End Month
+  isCurrentStudy: boolean;      // Is Currently Studying
+  highlights?: string;          // Highlights
 }
 
 export interface Skill {
@@ -201,6 +188,29 @@ export const SCHOOL_TYPES_ZH_TW = [
   '其他'
 ];
 
+export interface DocumentConfig {
+  language: 'en' | 'zh-TW';
+  labels: {
+    yourName: string;
+    email: string;
+    phone: string;
+    location: string;
+    website: string;
+    linkedin: string;
+    professionalSummary: string;
+    workExperience: string;
+    present: string;
+    education: string;
+    skills: string;
+    skill: string;
+    years: string;
+    level: string;
+    certificates: string;
+    languages: string;
+    hobbiesInterests: string;
+  };
+}
+
 // Helper functions
 export const getLocalizedEducationLevels = (language: string) => {
   return language === 'zh-TW' ? EDUCATION_LEVELS_ZH_TW : EDUCATION_LEVELS;
@@ -247,4 +257,54 @@ export const LANGUAGE_PROFICIENCY_ZH_TW = ['基礎', '對話', '流利', '母語
 // Helper function to get localized language proficiency levels
 export const getLocalizedLanguageProficiency = (language: string) => {
   return language === 'zh-TW' ? LANGUAGE_PROFICIENCY_ZH_TW : LANGUAGE_PROFICIENCY;
+};
+
+export const getDocumentConfig = (language: String = 'en'): DocumentConfig => {
+  if (language === 'zh-TW') {
+    return {
+      language: 'zh-TW',
+      labels: {
+        yourName: '您的姓名',
+        email: '電子郵件：',
+        phone: '電話：',
+        location: '地址：',
+        website: '網站：',
+        linkedin: 'LinkedIn：',
+        professionalSummary: '專業摘要',
+        workExperience: '工作經驗',
+        present: '目前',
+        education: '教育背景',
+        skills: '技能',
+        skill: '技能',
+        years: '年數',
+        level: '等級',
+        certificates: '證書',
+        languages: '語言能力',
+        hobbiesInterests: '興趣愛好'
+      }
+    };
+  } else {
+    return {
+      language: 'en',
+      labels: {
+        yourName: 'Your Name',
+        email: 'Email: ',
+        phone: 'Phone: ',
+        location: 'Location: ',
+        website: 'Website: ',
+        linkedin: 'LinkedIn: ',
+        professionalSummary: 'Professional Summary',
+        workExperience: 'Work Experience',
+        present: 'Present',
+        education: 'Education',
+        skills: 'Skills',
+        skill: 'Skill',
+        years: 'Years',
+        level: 'Level',
+        certificates: 'Certificates',
+        languages: 'Languages',
+        hobbiesInterests: 'Hobbies & Interests'
+      }
+    };
+  }
 };

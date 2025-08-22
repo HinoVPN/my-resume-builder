@@ -111,7 +111,6 @@ const WorkExperienceForm: React.FC = () => {
                     className="btn-danger flex items-center text-sm"
                   >
                     <Trash2 className="w-4 h-4 mr-1" />
-                    {t('common.remove')}
                   </button>
                 </div>
 

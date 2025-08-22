@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Download, Edit, RefreshCw } from 'lucide-react';
 import { useAppSelector } from '../hooks/redux';
-import { generateDocx } from '../utils/docxGenerator';
-import { generateDocxTC } from '../utils/docxGeneratorTC';
 import { renderAsync } from 'docx-preview';
+import { COMMON_CONSTANTS } from '../types/commonConstants';
+import { generateDocx } from '../utils/docxGenerator';
+import { generateDocxBlob } from '../utils/docxGenerator';
 
 const PreviewPage: React.FC = () => {
   const resumeData = useAppSelector(state => state.resume);
@@ -15,14 +16,12 @@ const PreviewPage: React.FC = () => {
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
   const [previewGenerated, setPreviewGenerated] = useState(false);
 
-  const generateDocxBlob = async (): Promise<Blob> => {
+  const generateDocxBlobPreview = async (resumeData: any): Promise<Blob> => {
       // We'll create new functions that return blobs instead of downloading
-      if (i18n.language === 'zh-TW') {
-        const { generateDocxBlobTC } = await import('../utils/docxGeneratorTC');
-        return await generateDocxBlobTC(resumeData as any);
+      if (i18n.language === COMMON_CONSTANTS.LANGUAGE['ZH-TW']) {
+        return await generateDocxBlob(resumeData, COMMON_CONSTANTS.LANGUAGE['ZH-TW']);
       } else {
-        const { generateDocxBlob } = await import('../utils/docxGenerator');
-        return await generateDocxBlob(resumeData as any);
+        return await generateDocxBlob(resumeData, COMMON_CONSTANTS.LANGUAGE['EN']);
       }
   };
 
@@ -50,7 +49,7 @@ const PreviewPage: React.FC = () => {
       //wait for 0.3 seconds before generating preview
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      const blob = await generateDocxBlob();
+      const blob = await generateDocxBlobPreview(resumeData);
       
       // Use docx-preview to render the document
       await renderAsync(blob, docxPreviewRef.current, undefined, {
@@ -114,10 +113,10 @@ const PreviewPage: React.FC = () => {
   const handleDownloadDocx = async () => {
     try {
       // Use Traditional Chinese version if language is zh-TW
-      if (i18n.language === 'zh-TW') {
-        await generateDocxTC(resumeData as any);
+      if (i18n.language === COMMON_CONSTANTS.LANGUAGE['ZH-TW']) {
+        await generateDocx(resumeData, COMMON_CONSTANTS.LANGUAGE['ZH-TW']);
       } else {
-        await generateDocx(resumeData as any);
+        await generateDocx(resumeData, COMMON_CONSTANTS.LANGUAGE['EN']);
       }
     } catch (error) {
       console.error('Failed to generate DOCX:', error);
@@ -226,7 +225,7 @@ const PreviewPage: React.FC = () => {
                 className="btn-primary flex items-center"
               >
                 <Download className="w-4 h-4 mr-2" />
-                {i18n.language === 'zh-TW' ? '下載 Word' : 'Download Word'}
+                {t('preview.downloadWord')}
               </button>
 
               {/* 
@@ -236,7 +235,7 @@ const PreviewPage: React.FC = () => {
                 className="btn-primary flex items-center bg-red-600 hover:bg-red-700"
               >
                 <FileDown className="w-4 h-4 mr-2" />
-                {i18n.language === 'zh-TW' ? '下載 PDF' : 'Download PDF'}
+                {i18n.language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? '下載 PDF' : 'Download PDF'}
               </button> */}
             </div>
           </div>

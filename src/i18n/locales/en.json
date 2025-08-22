@@ -177,8 +177,8 @@
     "title": "Resume Preview",
     "subtitle": "Review your resume and download when ready.",
     "backToEdit": "Back to Edit",
-    "editResume": "Edit Resume",
-    "downloadWord": "Download Word",
+    "editResume": "Edit",
+    "downloadWord": "Word",
     "downloadText": "Download Text",
     "sections": {
       "summary": "Professional Summary",
