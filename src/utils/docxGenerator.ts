@@ -9,7 +9,7 @@ import {
 import { COMMON_CONSTANTS } from '../types/commonConstants';
 
 export const createDocument = (resumeData: ResumeData, language: string = 'en') => {
-  console.log(`Starting ${language} DOCX generation...`, resumeData);
+  console.log(`Starting ${language} DOCX generation...`);
   
   const config = getDocumentConfig(language);
   const children: (Paragraph | Table)[] = [];
@@ -434,9 +434,7 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
       .filter(section => section.enabled)
       .sort((a, b) => a.order - b.order);
 
-    console.log(enabledSections);
     enabledSections.forEach(sectionInfo => {
-      console.log(sectionInfo);
       let sectionKey = '';
       
       // Map section IDs to masterSection keys
@@ -511,8 +509,6 @@ export const createDocument = (resumeData: ResumeData, language: string = 'en') 
     }
   }
 
-  console.log(`Creating ${language} document with`, orderedChildren.length, 'elements...');
-
   // Create the document
   const doc = new Document({
     numbering: {
@@ -572,10 +568,7 @@ export const generateDocx = async (resumeData: ResumeData, language: string = 'e
   try {
     const doc = createDocument(resumeData, language);
 
-    console.log('Converting to blob...');
     const blob = await Packer.toBlob(doc);
-    
-    console.log('Blob created, size:', blob.size);
     
     const fileName = resumeData.personalInfo.fullName 
       ? language === COMMON_CONSTANTS.LANGUAGE['ZH-TW']
@@ -583,11 +576,8 @@ export const generateDocx = async (resumeData: ResumeData, language: string = 'e
         : `${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_Resume.docx`
       : language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? '我的履歷.docx' : 'My_Resume.docx';
     
-    console.log('Downloading file:', fileName);
-    
     saveAs(blob, fileName);
     
-    console.log(`${language} DOCX generation completed successfully`);
     return true;
   } catch (error) {
     console.error(`Error generating ${language} DOCX:`, error);
@@ -605,10 +595,7 @@ export const generateDocxBlob = async (resumeData: ResumeData, language: string 
   try {
     const doc = createDocument(resumeData, language);
 
-    console.log('Converting to blob...');
     const blob = await Packer.toBlob(doc);
-    
-    console.log('Blob created, size:', blob.size);
      
     return blob;
   } catch (error) {
