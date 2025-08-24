@@ -365,7 +365,7 @@ const SkillsForm: React.FC = () => {
 
 ```mermaid
 graph LR
-    A[用戶輸入] --> B[dispatch(action)]
+    A[用戶輸入] --> B["dispatch(action)"]
     B --> C[Reducer處理]
     C --> D[State更新]
     D --> E[組件重渲染]
