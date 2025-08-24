@@ -134,15 +134,15 @@ const OrderingForm: React.FC = () => {
   const enabledSections = sections.filter(section => section.enabled);
   const disabledSections = sections.filter(section => !section.enabled);
 
-  // Debug: Log sections state
-  useEffect(() => {
-    console.log('Current sections:', sections.map(s => ({ 
-      id: s.id, 
-      enabled: s.enabled, 
-      order: s.order,
-      labelKey: s.labelKey 
-    })));
-  }, [sections]);
+  // Debug: Log sections state (uncomment if needed for debugging)
+  // useEffect(() => {
+  //   console.log('Current sections:', sections.map(s => ({ 
+  //     id: s.id, 
+  //     enabled: s.enabled, 
+  //     order: s.order,
+  //     labelKey: s.labelKey 
+  //   })));
+  // }, [sections]);
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
