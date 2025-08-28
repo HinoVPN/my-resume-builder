@@ -447,3 +447,145 @@
 .docx-preview-container {
   font-family: 'Times New Roman', Times, serif !important;
 }
+
+/* Mobile optimizations for DOCX preview */
+.mobile-optimized {
+  /* Ensure smooth scrolling on mobile */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent zoom on double tap */
+  touch-action: manipulation;
+}
+
+/* Mobile-specific DOCX preview styling */
+@media (max-width: 768px) {
+  .docx-preview-container.mobile-optimized {
+    /* Adjust minimum height for mobile */
+    min-height: 300px !important;
+    /* Better mobile scrolling */
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    /* Prevent horizontal overflow issues */
+    max-width: 100% !important;
+  }
+
+  /* Scale down DOCX content on mobile if needed */
+  .docx-preview-container.mobile-optimized .docx-wrapper {
+    transform-origin: top left;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  /* Ensure text is readable on mobile */
+  .docx-preview-container.mobile-optimized * {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Adjust margins and padding for mobile */
+  .docx-preview-container.mobile-optimized .docx-wrapper > * {
+    margin: 8px !important;
+    padding: 4px !important;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .docx-preview-container.mobile-optimized {
+    min-height: 250px !important;
+  }
+
+  .docx-preview-container.mobile-optimized * {
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* More compact spacing for very small screens */
+  .docx-preview-container.mobile-optimized .docx-wrapper > * {
+    margin: 4px !important;
+    padding: 2px !important;
+  }
+}
+
+/* Improve mobile touch targets */
+@media (max-width: 768px) {
+  .btn-primary,
+  .btn-secondary {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 12px;
+  }
+  
+  /* Ensure buttons are touch-friendly */
+  button {
+    touch-action: manipulation;
+  }
+}
+
+/* React Doc Viewer Mobile Optimizations */
+.document-viewer-container {
+  /* Ensure smooth scrolling */
+  -webkit-overflow-scrolling: touch;
+  
+  /* Prevent zoom on double tap */
+  touch-action: manipulation;
+}
+
+/* Mobile-specific document viewer styling */
+@media (max-width: 768px) {
+  .document-viewer-container {
+    /* Better mobile layout */
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* Override react-doc-viewer default styles for mobile */
+  .document-viewer-container > div {
+    min-height: 300px !important;
+    height: 400px !important;
+  }
+
+  /* Ensure document content is responsive */
+  .document-viewer-container iframe,
+  .document-viewer-container canvas,
+  .document-viewer-container embed,
+  .document-viewer-container object {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 400px !important;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .document-viewer-container > div {
+    min-height: 250px !important;
+    height: 300px !important;
+  }
+
+  .document-viewer-container iframe,
+  .document-viewer-container canvas,
+  .document-viewer-container embed,
+  .document-viewer-container object {
+    max-height: 300px !important;
+  }
+}
+
+/* Ensure document viewer controls are touch-friendly */
+.document-viewer-container button,
+.document-viewer-container [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+}
+
+/* Improve document viewer loading states */
+.document-viewer-container [data-testid="loading"],
+.document-viewer-container .loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+}

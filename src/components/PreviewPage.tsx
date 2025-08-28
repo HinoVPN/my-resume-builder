@@ -40,9 +40,9 @@ const PreviewPage: React.FC = () => {
           ? '正在重新生成預覽...' 
           : 'Regenerating preview...';
         docxPreviewRef.current.innerHTML = `
-          <div style="padding: 2rem; text-align: center; color: #3b82f6; border: 2px dashed #3b82f6; border-radius: 8px; margin: 1rem;">
-            <h3>${loadingMessage}</h3>
-            <p>${i18n.language === 'zh-TW' ? '切換語言後重新生成文檔預覽' : 'Regenerating document preview after language change'}</p>
+          <div style="padding: 1rem 1rem 2rem; text-align: center; color: #3b82f6; border: 2px dashed #3b82f6; border-radius: 8px; margin: 0.5rem; min-height: 200px; display: flex; flex-direction: column; justify-content: center;">
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 1rem;">${loadingMessage}</h3>
+            <p style="margin: 0; font-size: 0.875rem; opacity: 0.8;">${i18n.language === 'zh-TW' ? '切換語言後重新生成文檔預覽' : 'Regenerating document preview after language change'}</p>
           </div>
         `;
       }
@@ -95,9 +95,9 @@ const PreviewPage: React.FC = () => {
           : 'Please try downloading the document instead.';
         
         docxPreviewRef.current.innerHTML = `
-          <div style="padding: 2rem; text-align: center; color: #ef4444; border: 2px dashed #ef4444; border-radius: 8px; margin: 1rem;">
-            <h3>${errorMessage}</h3>
-            <p>${suggestionMessage}</p>
+          <div style="padding: 1rem; text-align: center; color: #ef4444; border: 2px dashed #ef4444; border-radius: 8px; margin: 0.5rem; min-height: 200px; display: flex; flex-direction: column; justify-content: center;">
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 1rem;">${errorMessage}</h3>
+            <p style="margin: 0; font-size: 0.875rem; opacity: 0.8;">${suggestionMessage}</p>
           </div>
         `;
       }
@@ -179,11 +179,13 @@ const PreviewPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {isGeneratingPreview && (
-      <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
-        <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mr-3" />
-        <span className="text-lg text-gray-700">
-          {i18n.language === 'zh-TW' ? '正在生成預覽...' : 'Generating preview...'}
-        </span>
+      <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-white bg-opacity-75 backdrop-blur-sm z-50">
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 mx-4 max-w-sm w-full text-center">
+          <RefreshCw className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-blue-600 mx-auto mb-2 sm:mb-3" />
+          <span className="text-sm sm:text-lg text-gray-700 block">
+            {i18n.language === 'zh-TW' ? '正在生成預覽...' : 'Generating preview...'}
+          </span>
+        </div>
       </div>
       )}
 
@@ -196,14 +198,15 @@ const PreviewPage: React.FC = () => {
               className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
-              {t('common.back')}
+              <span className="hidden sm:inline">{t('common.back')}</span>
             </button>
             
-            <h1 className="text-xl font-semibold text-gray-900">
+            <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate mx-2">
               {t('preview.title')}
             </h1>
             
-            <div className="flex space-x-3">
+            {/* Desktop button layout */}
+            <div className="hidden md:flex space-x-3">
               <button
                 onClick={() => navigate('/')}
                 className="btn-secondary flex items-center"
@@ -219,38 +222,49 @@ const PreviewPage: React.FC = () => {
                 <Download className="w-4 h-4 mr-2" />
                 {t('preview.downloadWord')}
               </button>
+            </div>
 
-              {/* 
-              //TODO: Add PDF download
+            {/* Mobile button layout */}
+            <div className="flex md:hidden space-x-2">
               <button
-                onClick={handleDownloadPdf}
-                className="btn-primary flex items-center bg-red-600 hover:bg-red-700"
+                onClick={() => navigate('/')}
+                className="btn-secondary flex items-center px-3 py-2 text-sm"
               >
-                <FileDown className="w-4 h-4 mr-2" />
-                {i18n.language === COMMON_CONSTANTS.LANGUAGE['ZH-TW'] ? '下載 PDF' : 'Download PDF'}
-              </button> */}
+                <Edit className="h-4" />
+                <span className="ml-1 hidden xs:inline">{t('common.edit')}</span>
+              </button>
+
+              <button
+                onClick={handleDownloadDocx}
+                className="btn-primary flex items-center px-3 py-2 text-sm"
+              >
+                <Download className="h-4" />
+                <span className="ml-1 hidden xs:inline">Word</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       {/* DOCX Preview */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8">
+      <div className="max-w-4xl mx-auto px-2 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden">
           <div 
             ref={docxPreviewRef}
-            className="docx-preview-container"
+            className="docx-preview-container mobile-optimized"
             data-language={i18n.language}
             style={{
-              minHeight: isGeneratingPreview ? '0' : '600px',
+              minHeight: isGeneratingPreview ? '0' : '400px',
               backgroundColor: '#ffffff',
-              width: '100%'
+              width: '100%',
+              overflowX: 'auto',
+              overflowY: 'auto'
             }}
           />
           
           {!isGeneratingPreview && !previewGenerated && (
-            <div className="flex items-center justify-center p-8 text-gray-500">
-              <span>
+            <div className="flex items-center justify-center p-4 sm:p-8 text-gray-500 min-h-[200px]">
+              <span className="text-sm sm:text-base text-center">
                 {i18n.language === 'zh-TW' ? '預覽將在生成後顯示' : 'Preview will appear here once generated'}
               </span>
             </div>
@@ -258,33 +272,49 @@ const PreviewPage: React.FC = () => {
         </div>
 
         {/* Information Cards */}
-        <div className="space-y-4 mt-6">
+        <div className="space-y-3 sm:space-y-4 mt-4 sm:mt-6">
           {/* Document Info */}
           <div className="text-center p-3 md:p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-xs sm:text-sm text-blue-800">
+            <p className="text-xs sm:text-sm text-blue-800 leading-relaxed">
               📄 <strong>{t('preview.documentInfo.title')}</strong> {t('preview.documentInfo.content')} 
               <span className="hidden sm:inline">{t('preview.documentInfo.details')}</span>
             </p>
           </div>
 
           {/* Mobile Device Notice */}
-          <div className="text-center p-3 md:p-4 bg-orange-50 border border-orange-200 rounded-lg">
+          <div className="p-3 md:p-4 bg-orange-50 border border-orange-200 rounded-lg">
             <div className="text-xs sm:text-sm text-orange-800">
-              <p className="mb-2 sm:mb-0">
-                📱 <strong>{t('preview.mobileNotice.title')}</strong> {t('preview.mobileNotice.subtitle')}
+              <div className="text-center mb-2 sm:mb-3">
+                <span className="text-lg">📱</span>
+                <strong className="ml-2">{t('preview.mobileNotice.title')}</strong>
+              </div>
+              <p className="text-center mb-3 sm:mb-4 text-orange-700">
+                {t('preview.mobileNotice.subtitle')}
               </p>
-              <div className="space-y-1 sm:space-y-0 text-left sm:text-center">
-                <div>• {t('preview.mobileNotice.options.option1')}</div>
-                <div>• {t('preview.mobileNotice.options.option2')}</div>
-                <div>• {t('preview.mobileNotice.options.option3')}</div>
-                <div>• {t('preview.mobileNotice.options.option4')}</div>
+              <div className="space-y-2 text-left">
+                <div className="flex items-start">
+                  <span className="text-orange-600 mr-2 mt-0.5">•</span>
+                  <span className="flex-1">{t('preview.mobileNotice.options.option1')}</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-orange-600 mr-2 mt-0.5">•</span>
+                  <span className="flex-1">{t('preview.mobileNotice.options.option2')}</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-orange-600 mr-2 mt-0.5">•</span>
+                  <span className="flex-1">{t('preview.mobileNotice.options.option3')}</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-orange-600 mr-2 mt-0.5">•</span>
+                  <span className="flex-1">{t('preview.mobileNotice.options.option4')}</span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Privacy Notice */}
           <div className="text-center p-3 md:p-4 bg-blue-50 rounded-lg">
-            <p className="text-xs sm:text-sm text-blue-800">
+            <p className="text-xs sm:text-sm text-blue-800 leading-relaxed">
               🔒 <strong>{t('preview.privacyNotice.title')}</strong> {t('preview.privacyNotice.content')} 
               <span className="hidden sm:inline">{t('preview.privacyNotice.reminder')}</span>
             </p>
